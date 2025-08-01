@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Faridabad Court Case Search</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Search Court Case</h1>
+    <form method="post">
+        <label for="case_number">Enter Case Number:</label>
+        <input type="text" id="case_number" name="case_number" required>
+        <button type="submit">Search</button>
+    </form>
+
+    {% if result %}
+        <h2>Case Details</h2>
+        <ul>
+            {% for key, value in result.items() %}
+                <li><strong>{{ key }}:</strong> {{ value }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</body>
+</html>
