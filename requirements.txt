@@ -6,4 +6,7 @@ Flask-WTF==1.2.1
 python-dotenv==1.0.1
 requests==2.31.0
 gunicorn==21.2.0
-pandas==2.2.2
+beautifulsoup4==4.12.3
+pdfminer.six==20221105
+pandas==2.1.4
+selenium==4.16.0

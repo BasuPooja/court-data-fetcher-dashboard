@@ -1,0 +1,39 @@
+<!-- templates/fetch_case.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="form-container">
+    <h3>Case Status : Search by Case Number</h3>
+    <form method="POST" action="/fetch-case">
+        <label for="court_complex">Court Complex *</label>
+        <select id="court_complex" name="court_complex" required>
+            <option value="">Select Court Complex</option>
+            <option value="1">Court Complex 1</option>
+            <option value="2">Court Complex 2</option>
+        </select>
+
+        <label for="case_type">Case Type *</label>
+        <select id="case_type" name="case_type" required>
+            <option value="">--Select Case Type--</option>
+            <option value="CIVIL">Civil</option>
+            <option value="CRIMINAL">Criminal</option>
+        </select>
+
+        <label for="case_number">Case Number *</label>
+        <input type="text" id="case_number" name="case_number" required placeholder="Enter Case Number">
+
+        <label for="year">Filing Year *</label>
+        <input type="text" id="year" name="year" required placeholder="e.g. 2022">
+
+        <div class="captcha-box">
+            <img src="{{ url_for('static', filename='media/captcha-sample.png') }}" alt="Captcha Image">
+            <input type="text" name="captcha" placeholder="Enter Captcha" required>
+        </div>
+
+        <div class="buttons">
+            <button type="submit">Search</button>
+            <button type="reset">Reset</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

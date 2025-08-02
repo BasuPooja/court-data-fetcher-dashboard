@@ -1,0 +1,49 @@
+<!-- templates/base.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Court Dashboard{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="header-content">
+            <img src="{{ url_for('static', filename='media/logo.png') }}" alt="Logo" class="header-logo">
+            <div class="header-title">
+                <h2>जिला अदालत फरीदाबाद</h2>
+                <h1>District Court Faridabad</h1>
+                <h2>e-Courts Mission Mode Project</h2>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <ul>
+    <li><a href="{{ url_for('main.home') }}">Home</a></li>
+    <li><a href="{{ url_for('main.about_project') }}">About Project</a></li>
+    <li><a href="{{ url_for('main.fetch_case') }}">Case Status</a></li>
+    <li><a href="{{ url_for('main.dashboard') }}">Dashboard</a></li>
+</ul>
+
+    </nav>
+
+    <!-- Content -->
+    <main class="content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer text-center text-white py-3">
+        <p>© 2025 | Court Data Fetcher – Faridabad District Court</p>
+        <p>
+            <a href="#">Terms of Use</a> | <a href="#">Privacy Policy</a>
+        </p>
+        <small>This is a demo interface for educational use only. Not affiliated with any government body.</small>
+    </footer>
+
+</body>
+</html>

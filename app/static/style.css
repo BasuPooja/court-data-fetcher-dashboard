@@ -1,13 +1,205 @@
+/* Reset and base styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 body {
-    font-family: Arial, sans-serif;
-    margin: 30px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  height: 100vh;
+  color: #000;
+  animation: slideshow 30s infinite;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
-input, button {
-    padding: 8px;
-    margin-top: 10px;
+/* Slideshow Animation */
+@keyframes slideshow {
+  0%   { background-image: url('media/bg1.jpg'); }
+  33%  { background-image: url('media/bg2.jpg'); }
+  66%  { background-image: url('media/bg3.jpg'); }
+  100% { background-image: url('media/bg1.jpg'); }
 }
 
-h1 {
-    color: #004080;
+/* Header styles */
+header {
+  background-color: #fff;
+  display: flex;
+  align-items: center;
+  padding: 20px 40px;
+  border-bottom: 3px solid #900;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  margin-left: 50px; /* 👈 shifts logo+title to the right */
+}
+
+.header-logo {
+  height: 100px;
+  margin-right: 20px;
+}
+
+.header-title h1 {
+  margin: 0;
+  font-size: 28px;
+  color: #000;
+}
+
+.header-title h2 {
+  margin: 5px 0 0;
+  font-size: 18px;
+  color: #900;
+}
+
+
+/* Form container */
+.form-container {
+  background-color: rgba(255, 255, 255, 0.9);
+  max-width: 500px;
+  margin: 60px auto;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+}
+
+.form-container h3 {
+  margin-bottom: 20px;
+  color: #900;
+  text-align: center;
+  font-size: 22px;
+}
+
+/* Form elements */
+label {
+  display: block;
+  margin: 15px 0 5px;
+  font-weight: bold;
+}
+
+input[type="text"],
+select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #aaa;
+  border-radius: 4px;
+  font-size: 1em;
+}
+
+/* CAPTCHA area */
+.captcha-box {
+  display: flex;
+  align-items: center;
+  margin-top: 15px;
+}
+
+.captcha-box img {
+  height: 50px;
+  margin-right: 10px;
+}
+
+/* Buttons */
+.buttons {
+  text-align: center;
+  margin-top: 20px;
+}
+
+button {
+  padding: 12px 20px;
+  margin: 0 10px;
+  font-size: 1em;
+  font-weight: bold;
+  background-color: #900;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+button:hover {
+  background-color: #700;
+}
+/* Navbar Styles */
+.navbar {
+  background-color: #900; /* Court red */
+  padding: 10px 0;
+  width: 100%;
+  text-align: center;
+  position: relative;
+  z-index: 10; /* ensures it stays on top */
+}
+
+.navbar ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: inline-flex;
+  justify-content: center;
+  gap: 30px;
+}
+
+.navbar li {
+  display: inline;
+}
+
+.navbar a {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+  padding: 8px 16px;
+  display: inline-block;
+  transition: background 0.3s ease;
+}
+
+.navbar a:hover {
+  background-color: #555;
+  border-radius: 4px;
+}
+
+/* Sticky footer base setup */
+html, body {
+  height: 100%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.footer {
+  margin-top: auto;
+  background-color: #900;
+  color: white;
+  padding: 20px 15px;
+  text-align: center;
+  font-size: 0.95rem;
+  border-top: 4px solid #f3c623;
+  box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.25);
+}
+
+.footer-content p {
+  margin: 6px 0;
+  line-height: 1.4;
+}
+
+.footer-links a {
+  color: #f3c623;
+  text-decoration: none;
+  margin: 0 6px;
+  font-weight: 500;
+}
+
+.footer-links a:hover {
+  text-decoration: underline;
+}
+
+.disclaimer {
+  font-size: 0.8rem;
+  color: #ccc;
 }

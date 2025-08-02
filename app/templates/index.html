@@ -1,24 +1,82 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Faridabad Court Case Search</title>
+    <meta charset="UTF-8">
+    <title>Court Data Fetcher | Faridabad District Court</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <h1>Search Court Case</h1>
-    <form method="post">
-        <label for="case_number">Enter Case Number:</label>
-        <input type="text" id="case_number" name="case_number" required>
-        <button type="submit">Search</button>
-    </form>
 
-    {% if result %}
-        <h2>Case Details</h2>
-        <ul>
-            {% for key, value in result.items() %}
-                <li><strong>{{ key }}:</strong> {{ value }}</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
+    <!-- Header -->
+    <header>
+  <div class="header-content">
+    <img src="{{ url_for('static', filename='media/logo.png') }}" alt="Logo" class="header-logo">
+    <div class="header-title">
+        <h2>जिला अदालत फरीदाबाद</h2>
+        <h1>District Court Faridabad</h1>
+        <h2>e-Courts Mission Mode Project</h2>
+    </div>
+  </div>
+</header>
+
+
+    <!-- Menu Bar -->
+    <nav class="navbar">
+    <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="#project">About Project</a></li>
+        <li><a href="#dashboard">Dashboard</a></li>
+        <li><a href="#contact">Contact</a></li>
+    </ul>
+    </nav>
+
+
+    <!-- Form -->
+    <div class="form-container">
+        <h3>Case Status : Search by Case Number</h3>
+        <form method="POST" action="/fetch-case">
+            <label for="court_complex">Court Complex *</label>
+            <select id="court_complex" name="court_complex" required>
+                <option value="">Select Court Complex</option>
+                <option value="1">Court Complex 1</option>
+                <option value="2">Court Complex 2</option>
+            </select>
+
+            <label for="case_type">Case Type *</label>
+            <select id="case_type" name="case_type" required>
+                <option value="">--Select Case Type--</option>
+                <option value="CIVIL">Civil</option>
+                <option value="CRIMINAL">Criminal</option>
+                <!-- Add more case types -->
+            </select>
+
+            <label for="case_number">Case Number *</label>
+            <input type="text" id="case_number" name="case_number" required placeholder="Enter Case Number">
+
+            <label for="year">Filing Year *</label>
+            <input type="text" id="year" name="year" required placeholder="e.g. 2022">
+
+            <div class="captcha-box">
+                <img src="{{ url_for('static', filename='media/captcha-sample.png') }}" alt="Captcha Image">
+                <input type="text" name="captcha" placeholder="Enter Captcha" required>
+            </div>
+
+            <div class="buttons">
+                <button type="submit">Search</button>
+                <button type="reset">Reset</button>
+            </div>
+        </form>
+    </div>
+<footer class="footer">
+    <div class="footer-content">
+        <p>© 2025 | Court Data Fetcher – Faridabad District Court</p>
+        <p class="footer-links">
+            <a href="/terms">Terms of Use</a> |
+            <a href="/privacy">Privacy Policy</a>
+        </p>
+        <p class="disclaimer">This is a demo interface for educational use only. Not affiliated with any government body.</p>
+    </div>
+</footer>
+
 </body>
 </html>
