@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block title %}Enter Case Details{% endblock %}
+
+{% block content %}
+<style>
+    .center-card {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 80vh;
+    }
+
+    .card-custom {
+        background-color: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+        width: 700px;
+    }
+
+    .card-custom h2 {
+        font-weight: bold;
+        margin-bottom: 15px;
+        color: #8B0000;
+    }
+
+    .btn-primary {
+        background-color: #8B0000;
+        border: none;
+    }
+
+    .btn-primary:hover {
+        background-color: #a00000;
+    }
+
+    #success-message {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background-color: #d4edda;
+        color: #155724;
+        padding: 12px 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+        font-weight: bold;
+        display: none;
+    }
+</style>
+
+{% if message %}
+<div id="success-message">{{ message }}</div>
+<script>
+    window.onload = function () {
+        const msg = document.getElementById('success-message');
+        msg.style.display = 'block';
+        setTimeout(() => {
+            msg.style.display = 'none';
+        }, 4000);
+    }
+</script>
+{% endif %}
+
+<div class="center-card">
+    <div class="card-custom">
+        <h2 class="text-center">Enter Case Details</h2>
+
+        <form method="POST" action="{{ url_for('main.enter_case') }}">
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="case_type">Case Type *</label>
+                    <select id="case_type" name="case_type" required>
+                        <option value="">--Select Case Type--</option>
+                        <option value="CIVIL">Civil</option>
+                        <option value="CRIMINAL">Criminal</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label for="case_number">Case Number *</label>
+                    <input type="text" class="form-control" id="case_number" name="case_number" required>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="petitioner">Petitioner *</label>
+                    <input type="text" class="form-control" id="petitioner" name="petitioner" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="respondent">Respondent *</label>
+                    <input type="text" class="form-control" id="respondent" name="respondent" required>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="next_hearing_date">Next Hearing Date *</label>
+                    <input type="date" class="form-control" id="next_hearing_date" name="next_hearing_date" style=" width: 640px;height: 35px;" required>
+                </div>
+            </div>
+
+            <input type="hidden" id="filing_date" name="filing_date">
+            <input type="hidden" id="filing_year" name="filing_year">
+            <br>
+            <div class="d-flex justify-content-between mt-4">
+                <button type="submit" class="btn btn-primary">Submit</button>
+                <button type="reset" class="btn btn-secondary">Reset</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Automatically set filing date and year
+    const today = new Date();
+    document.getElementById("filing_date").value = today.toISOString().split('T')[0];
+    document.getElementById("filing_year").value = today.getFullYear();
+</script>
+{% endblock %}
