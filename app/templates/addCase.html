@@ -15,7 +15,7 @@
         padding: 30px;
         border-radius: 10px;
         box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-        width: 700px;
+        width: 800px;
     }
 
     .card-custom h2 {
@@ -63,47 +63,65 @@
 
 <div class="center-card">
     <div class="card-custom">
-        <h2 class="text-center">Enter Case Details</h2>
+        <h2 class="text-center">Case Query Details</h2>
 
-        <form method="POST" action="{{ url_for('main.enter_case') }}">
+        <form method="POST" action="{{ url_for('main.add_case') }}">
             <div class="row mb-3">
                 <div class="col-md-6">
+                    <label for="court_complex">Court Complex</label>
+                    <select id="court_complex" name="court_complex" class="form-control" required>
+                        <option value="">--Select Court Complex--</option>
+                        <option value="Faridabad District Court">Faridabad District Court</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
                     <label for="case_type">Case Type *</label>
-                    <select id="case_type" name="case_type" required>
+                    <select id="case_type" name="case_type" class="form-control" required>
                         <option value="">--Select Case Type--</option>
-                        <option value="CIVIL">Civil</option>
-                        <option value="CRIMINAL">Criminal</option>
+                        <option>District & Sessions Court</option>
+                        <option>Chief Judicial Magistrate Court</option>
+                        <option>Additional District Court</option>
+                        <option>Senior Civil Judge Court</option>
+                        <option>Junior Civil Judge Court</option>
+                        <option>Family Court (District Level)</option>
+                        <option>Fast Track District Court</option>
                     </select>
                 </div>
                 <div class="col-md-6">
                     <label for="case_number">Case Number *</label>
-                    <input type="text" class="form-control" id="case_number" name="case_number" required>
+                    <input type="text" class="form-control" id="case_number"
+                           name="case_number" value="{{ case_number }}" readonly required>
                 </div>
             </div>
 
             <div class="row mb-3">
                 <div class="col-md-6">
-                    <label for="petitioner">Petitioner *</label>
-                    <input type="text" class="form-control" id="petitioner" name="petitioner" required>
+                    <label for="filing_year">Filing Year *</label>
+                    <select name="filing_year" id="filing_year" class="form-control" required>
+                        <option value="" disabled selected>--Select year--</option>
+                        {% for year in range(2000, current_year + 1) %}
+                            <option value="{{ year }}">{{ year }}</option>
+                        {% endfor %}
+                    </select>
                 </div>
                 <div class="col-md-6">
-                    <label for="respondent">Respondent *</label>
-                    <input type="text" class="form-control" id="respondent" name="respondent" required>
+                    <label for="state">State</label>
+                    <input type="text" class="form-control" id="state" name="state">
                 </div>
             </div>
 
             <div class="row mb-3">
                 <div class="col-md-6">
-                    <label for="next_hearing_date">Next Hearing Date *</label>
-                    <input type="date" class="form-control" id="next_hearing_date" name="next_hearing_date" style=" width: 640px;height: 35px;" required>
+                    <label for="district">District</label>
+                    <input type="text" class="form-control" id="district" name="district">
                 </div>
             </div>
 
+            <!-- Hidden auto-filled field -->
             <input type="hidden" id="filing_date" name="filing_date">
-            <input type="hidden" id="filing_year" name="filing_year">
             <br>
             <div class="d-flex justify-content-between mt-4">
-                <button type="submit" class="btn btn-primary">Submit</button>
+                <button type="submit" class="btn btn-primary">Next</button>
                 <button type="reset" class="btn btn-secondary">Reset</button>
             </div>
         </form>
@@ -111,9 +129,8 @@
 </div>
 
 <script>
-    // Automatically set filing date and year
+    // Automatically set filing date (hidden input)
     const today = new Date();
     document.getElementById("filing_date").value = today.toISOString().split('T')[0];
-    document.getElementById("filing_year").value = today.getFullYear();
 </script>
 {% endblock %}

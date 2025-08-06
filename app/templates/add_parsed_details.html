@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block title %}Parsed Case Details{% endblock %}
+
+{% block content %}
+<style>
+    .center-card {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 80vh;
+    }
+
+    .card-custom {
+        background-color: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+        width: 800px;
+    }
+
+    .card-custom h2 {
+        font-weight: bold;
+        margin-bottom: 15px;
+        color: #8B0000;
+    }
+
+    .btn-primary {
+        background-color: #8B0000;
+        border: none;
+    }
+
+    .btn-primary:hover {
+        background-color: #a00000;
+    }
+
+    #success-message {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background-color: #d4edda;
+        color: #155724;
+        padding: 12px 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+        font-weight: bold;
+        display: none;
+    }
+</style>
+
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <div id="success-message" style="background-color: #e6ffe6; padding: 10px; border: 1px solid #00cc00; color: #006600; margin-bottom: 10px;">
+      {{ messages[0] }}
+    </div>
+    <script>
+      window.onload = function () {
+          const msg = document.getElementById('success-message');
+          msg.style.display = 'block';
+          setTimeout(() => {
+              msg.style.display = 'none';
+          }, 4000);
+      }
+    </script>
+  {% endif %}
+{% endwith %}
+
+
+
+
+<div class="center-card">
+    <div class="card-custom">
+        <h2 class="text-center">Step 2: Parsed Case Details</h2>
+
+        <form method="POST" action="{{ url_for('main.add_parsed_case', query_id=query_id) }}">
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="registration_number">Registration Number *</label>
+                    <input type="text" class="form-control" name="registration_number"
+                           value="{{ registration_number }}" readonly required>
+                </div>
+
+                <div class="col-md-6">
+                    <label>Registration Date:</label>
+                    <input type="date" STYLE="height:35px; width: 740px;" class="form-control" name="registration_date">
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label>Judgment Date:</label>
+                    <input type="date" STYLE="height:35px; width: 740px;" class="form-control" name="judgment_date">
+                </div>
+                <div class="col-md-6">
+                    <label>Petitioner:</label>
+                    <input type="text" class="form-control" name="petitioner">
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label>Respondent:</label>
+                    <input type="text" class="form-control" name="respondent">
+                </div>
+                <div class="col-md-6">
+                    <label>Advocate Name:</label>
+                    <input type="text" class="form-control" name="advocate_name">
+                </div>
+            </div>
+            <br>
+            <div class="d-flex justify-content-between mt-4">
+                <button type="submit" class="btn btn-primary">Submit</button>
+                <button type="reset" class="btn btn-secondary">Reset</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

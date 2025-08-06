@@ -15,8 +15,13 @@
         <label for="case_type">Case Type *</label>
         <select id="case_type" name="case_type" required>
             <option value="">--Select Case Type--</option>
-            <option value="CIVIL">Civil</option>
-            <option value="CRIMINAL">Criminal</option>
+            <option>District & Sessions Court</option>
+            <option>Chief Judicial Magistrate Court</option>
+            <option>Additional District Court</option>
+            <option>Senior Civil Judge Court</option>
+            <option>Junior Civil Judge Court</option>
+            <option>Family Court (District Level)</option>
+            <option>Fast Track District Court</option>
         </select>
 
         <label for="case_number">Case Number *</label>
@@ -26,9 +31,11 @@
         <input type="text" id="year" name="year" required placeholder="e.g. 2022">
 
         <div class="captcha-box">
-            <img src="{{ url_for('static', filename='media/captcha-sample.png') }}" alt="Captcha Image">
+            <img src="{{ url_for('main.captcha_image') }}" alt="Captcha Image">
+            <button type="button" onclick="refreshCaptcha()">🔄 Refresh Captcha</button>
             <input type="text" name="captcha" placeholder="Enter Captcha" required>
         </div>
+
 
         <div class="buttons">
             <button type="submit">Search</button>
@@ -36,4 +43,12 @@
         </div>
     </form>
 </div>
+<script>
+    function refreshCaptcha() {
+        const img = document.getElementById("captchaImage");
+        // Appends a timestamp to force image refresh
+        img.src = img.src.split("?")[0] + "?t=" + new Date().getTime();
+    }
+</script>
+
 {% endblock %}
