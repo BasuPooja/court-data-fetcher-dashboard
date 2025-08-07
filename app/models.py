@@ -38,4 +38,6 @@ class ParsedCaseDetails(db.Model):
 
     next_hearing_date = db.Column(db.String(20))
 
+    Remark = db.Column(db.String(500))
+
 
