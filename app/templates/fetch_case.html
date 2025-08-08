@@ -36,31 +36,13 @@
 
         <label for="year">Filing Year *</label>
         <input type="text" id="year" name="year" required placeholder="e.g. 2022">
-
-<!--        <div class="captcha-box">-->
-<!--            <label for="captcha" class="captcha-label">Enter captcha: <span style="color:red">*</span></label>-->
-
-<!--            &lt;!&ndash; Captcha Display and Refresh Button &ndash;&gt;-->
-<!--            <div class="captcha-container" style="display: flex; align-items: center; gap: 10px; margin-top: 8px;">-->
-<!--                <span id="captcha-text" style="font-size: 20px; font-weight: bold;">{{ captcha_text }}</span>-->
-<!--                <button type="button" onclick="refreshCaptcha();" aria-label="Refresh Captcha" title="Refresh Captcha" style="background: none; border: none; font-size: 18px; cursor: pointer;">-->
-<!--                    🔄-->
-<!--                </button>-->
-<!--            </div>-->
-
-<!--            &lt;!&ndash; Captcha Input &ndash;&gt;-->
-<!--            <div style="margin-top: 10px;">-->
-<!--                <input type="text" name="captcha" id="captcha" placeholder="Enter CAPTCHA" required-->
-<!--                       style="padding: 6px 10px; width: 100%; box-sizing: border-box;">-->
-<!--            </div>-->
-<!--        </div>-->
             <div class="captcha-box">
                 <label for="captcha">Enter Captcha *</label>
 
 
                 <!-- Line 1: Captcha Image + Refresh -->
                 <div style="display: flex; align-items: center; margin-top: 5px;">
-                    <img id="captchaImage" src="{{ url_for('main.generate_captcha') }}" alt="CAPTCHA" style="border: 1px solid #ccc; height: 35px; margin-right: 6px;">
+                    <img id="captchaImage" src="{{ url_for('main.captcha_image') }}" alt="CAPTCHA" style="border: 1px solid #ccc; height: 35px; margin-right: 6px;">
                     <a href="#" onclick="refreshCaptcha(); return false;" title="Refresh Captcha">🔄</a>
                 </div>
                 <br>
@@ -91,8 +73,18 @@
 <script>
     function refreshCaptcha() {
         const img = document.getElementById("captchaImage");
-        img.src = "{{ url_for('main.generate_captcha') }}" + "?_=" + new Date().getTime(); // Prevent caching
+        img.src = "{{ url_for('main.captcha_image') }}" + "?_=" + new Date().getTime(); // Prevent caching
     }
 </script>
-
+<script>
+function refreshCaptcha() {
+    document.getElementById('captcha-img').src = "{{ url_for('main.captcha_image') }}" + "?" + Date.now();
+}
+</script>
+<script>
+function refreshCaptcha() {
+    document.getElementById('captcha-img').src =
+        "{{ url_for('main.captcha_image') }}" + "?" + Date.now();
+}
+</script>
 {% endblock %}

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>View PDF - District Court Faridabad</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            max-width: 1000px;
+            margin: auto;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .pdf-frame {
+            width: 100%;
+            height: 700px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .download-btn {
+            display: inline-block;
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 20px;
+            margin-top: 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .download-btn:hover {
+            background-color: #0056b3;
+        }
+
+        .center {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>📄 Judgment Report Preview</h2>
+
+        <iframe class="pdf-frame" src="{{ pdf_url }}"></iframe>
+
+        <div class="center">
+            <a href="{{ pdf_url }}" class="download-btn" download>⬇️ Download PDF</a>
+        </div>
+    </div>
+</body>
+</html>
