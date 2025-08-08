@@ -25,9 +25,10 @@
         }
 
         .section-title {
-            background-color: #f2f2f2;
+            background-color: #900;
+            color: #fff;
             font-weight: bold;
-            font-size: 13px;
+            font-size: 16px;
             padding: 8px;
             margin: 20px 0 10px;
             border-left: 5px solid #888;
@@ -70,22 +71,28 @@
 <body>
 
     <!-- Header using table -->
-    <table width="100%" style="margin-bottom: 20px;">
+    <table width="100%" style="margin-bottom: 20px; border-collapse: collapse;">
         <tr>
+            <!-- Logo Left -->
             <td width="20%" align="left">
-                <img src="/absolute/path/to/static/media/logo.png" width="70">
+                <img src="{{ logo_path }}" width="70">
             </td>
-            <td width="60%" align="center">
-                <h2 style="margin: 0; font-size: 14px;">जिला अदालत फरीदाबाद</h2>
-                <h1 style="margin: 3px 0; font-size: 18px; text-transform: uppercase;">District Court Faridabad</h1>
-                <h2 style="margin: 0; font-size: 12px;">e-Courts Mission Mode Project</h2>
-            </td>
-            <td width="20%" align="right">
-                <img src="/absolute/path/to/static/media/flag.png" width="70">
 
+            <!-- Title Centered -->
+            <td width="60%" align="center">
+                <div>
+                    <h1 style="margin: 3px 0; font-size: 18px; text-transform: uppercase;">District Court Faridabad</h1>
+                    <h2 style="margin: 0; font-size: 12px;">e-Courts Mission Mode Project</h2>
+                </div>
+            </td>
+
+            <!-- Flag Right -->
+            <td width="20%" align="right">
+                <img src="{{ flag_path }}" width="70">
             </td>
         </tr>
     </table>
+
 
     <!-- Sub Info -->
     <div class="sub-info">
@@ -119,7 +126,7 @@
 
     <!-- Section 3 -->
     <div class="section-title">3. Remarks</div>
-    <p>No further judgment content extracted.</p>
+    <p>{{ details.Remark }}</p>
 
     <!-- Footer -->
     <div class="footer">

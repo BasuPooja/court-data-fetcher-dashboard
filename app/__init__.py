@@ -1,8 +1,9 @@
 import os
 from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
-import config
 from flask_migrate import Migrate
+from jinja2 import StrictUndefined
+import config
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -14,14 +15,18 @@ def create_app():
     db.init_app(app)
     migrate.init_app(app, db)
 
-    from .models import CaseQuery, ParsedCaseDetails # ⬅️ Import your models before create_all
-    from .routes import main       # ⬅️ Import and register blueprint
+    # Import models before creating tables
+    from .models import CaseQuery, ParsedCaseDetails
+    from .routes import main  # Import blueprint
 
     with app.app_context():
-        db.create_all()  # ⬅️ Now creates tables for CaseQuery and other models
+        db.create_all()  # Create tables if not exist
 
     # Register blueprint
     app.register_blueprint(main)
+
+    # Make Jinja throw errors for undefined vars
+    app.jinja_env.undefined = StrictUndefined
 
     # Error handlers
     @app.errorhandler(404)
@@ -30,6 +35,7 @@ def create_app():
 
     @app.errorhandler(500)
     def internal_error(error):
+        db.session.rollback()  # Rollback in case of DB errors
         return render_template('error.html'), 500
 
     return app

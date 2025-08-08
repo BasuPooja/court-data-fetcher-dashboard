@@ -17,11 +17,12 @@ from xhtml2pdf.default import DEFAULT_FONT
 import os
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
+from jinja2 import StrictUndefined
+
 
 # Get absolute path to font file
 font_path = os.path.join(os.path.dirname(__file__), 'static', 'fonts', 'NotoSansDevanagari-Regular.ttf')
 pdfmetrics.registerFont(TTFont('NotoSansDevanagari', font_path))
-
 
 faker = Faker()
 
@@ -152,13 +153,6 @@ def generate_order_pdf(query_id):
     response.headers['Content-Disposition'] = f'attachment; filename=Judgment_{query.case_number}.pdf'
     return response
 
-# def generate_captcha():
-#     captcha = ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
-#     session['captcha'] = captcha
-#     return captcha
-
-
-
 @main.route('/captcha')
 def generate_captcha():
     # Captcha configuration
@@ -210,6 +204,8 @@ def generate_captcha():
     buffer.seek(0)
     return send_file(buffer, mimetype='image/png')
 
+def absolute_path(relative_path):
+    return os.path.abspath(os.path.join('app', relative_path))
 
 @main.route('/fetch-case', methods=['GET', 'POST'])
 def fetch_case():
@@ -221,13 +217,11 @@ def fetch_case():
             flash("❌ Invalid captcha. Please try again.", "danger")
             return redirect(url_for('main.fetch_case'))
 
-        # Simulate DB logic
         case_type = request.form['case_type']
         case_number = request.form['case_number']
         filing_year = request.form['year']
         court_complex = request.form['court_complex']
 
-        # MOCK DATA
         query = {
             "id": random.randint(1000, 9999),
             "case_type": case_type,
@@ -251,8 +245,18 @@ def fetch_case():
             "Remark": "ABC"
         }
 
-        html = render_template('GeneratedReport.html', query=query, details=details,
-                               current_date=datetime.now().strftime('%d-%m-%Y'))
+        # Add absolute paths for logo and flag
+        logo_path = absolute_path('static/media/logo.png')
+        flag_path = absolute_path('static/media/flag.png')
+
+        html = render_template(
+            'GeneratedReport.html',
+            query=query,
+            details=details,
+            current_date=datetime.now().strftime('%d-%m-%Y'),
+            logo_path=logo_path,
+            flag_path=flag_path
+        )
 
         pdf_buffer = BytesIO()
         pisa.CreatePDF(html, dest=pdf_buffer)
@@ -261,52 +265,101 @@ def fetch_case():
         return send_file(pdf_buffer, mimetype='application/pdf',
                          download_name=f"Order_Summary_{query['id']}.pdf")
 
-    # GET request
     captcha = generate_captcha()
     return render_template('fetch_case.html', captcha_text=captcha)
+
 
 @main.route('/new-captcha')
 def new_captcha():
     captcha = generate_captcha()
     return captcha
 
-
 @main.route('/dashboard')
 def dashboard():
-    # Case Queries Over Time (Group by Year-Month)
+    selected_year = request.args.get("year", "All")
+
+    available_years_query = db.session.query(
+        func.extract('year', CaseQuery.query_time).label('year')
+    ).distinct().order_by(func.extract('year', CaseQuery.query_time)).all()
+
+    available_years = [str(row.year) for row in available_years_query if row.year]
+
+    filters = []
+    if selected_year != "All":
+        try:
+            filters.append(func.extract('year', CaseQuery.query_time) == int(selected_year))
+        except ValueError:
+            selected_year = "All"  # Fallback to avoid crash
+
+    # 1️⃣ Case Queries Over Time
     query_over_time = (
         db.session.query(
             func.to_char(CaseQuery.query_time, 'YYYY-MM').label('month'),
-            func.count(CaseQuery.id)
+            func.count(CaseQuery.id).label('count')
         )
-        .group_by(func.to_char(CaseQuery.query_time, 'YYYY-MM'))
-        .order_by(func.to_char(CaseQuery.query_time, 'YYYY-MM'))
+        .filter(*filters)
+        .group_by('month')
+        .order_by('month')
         .all()
     )
+    months = [row.month for row in query_over_time]
+    month_counts = [row.count for row in query_over_time]
 
-    months = [row[0] for row in query_over_time]
-    month_counts = [row[1] for row in query_over_time]
+    # 2️⃣ Status Distribution
+    status_distribution = (
+        db.session.query(
+            CaseQuery.status,
+            func.count(CaseQuery.id).label('count')
+        )
+        .filter(*filters)
+        .group_by(CaseQuery.status)
+        .all()
+    )
+    status_labels = [row.status for row in status_distribution]
+    status_data = [row.count for row in status_distribution]
 
-    # 2. Query Status Distribution
-    status_counts = db.session.query(
-        CaseQuery.status, func.count(CaseQuery.id)
-    ).group_by(CaseQuery.status).all()
+    # 3️⃣ Top 5 Case Types
+    top_case_types = (
+        db.session.query(
+            CaseQuery.case_type,
+            func.count(CaseQuery.id).label('count')
+        )
+        .filter(*filters)
+        .group_by(CaseQuery.case_type)
+        .order_by(func.count(CaseQuery.id).desc())
+        .limit(5)
+        .all()
+    )
+    type_labels = [row.case_type for row in top_case_types]
+    type_data = [row.count for row in top_case_types]
 
-    status_labels = [item[0] for item in status_counts]
-    status_data = [item[1] for item in status_counts]
+    # 4️⃣ Summary Counts
+    total_cases = sum(status_data) if status_data else 0
+    pending_cases = dict(zip(status_labels, status_data)).get("Pending", 0)
+    completed_cases = dict(zip(status_labels, status_data)).get("Completed", 0)
+    other_cases = total_cases - pending_cases - completed_cases
 
-    # 3. Top Case Types
-    type_counts = db.session.query(
-        CaseQuery.case_type, func.count(CaseQuery.id)
-    ).group_by(CaseQuery.case_type).order_by(func.count(CaseQuery.id).desc()).limit(5).all()
+    return render_template(
+        'dashboard.html',
+        selected_year=selected_year or "All",
+        available_years=available_years or [],
+        total_cases=total_cases or 0,
+        pending_cases=pending_cases or 0,
+        completed_cases=completed_cases or 0,
+        other_cases=other_cases or 0,
+        months=months or [],
+        month_counts=month_counts or [],
+        status_labels=status_labels or [],
+        status_data=status_data or [],
+        type_labels=type_labels or [],
+        type_data=type_data or [],
+        time_labels=months or [],
+        time_values=month_counts or [],
+        pie_labels=status_labels or [],
+        pie_values=status_data or [],
+        bar_labels=type_labels or [],
+        bar_values=type_data or []
+    )
 
-    type_labels = [item[0] for item in type_counts]
-    type_data = [item[1] for item in type_counts]
 
-    return render_template('dashboard.html',
-                           months=months,
-                           month_counts=month_counts,
-                           status_labels=status_labels,
-                           status_data=status_data,
-                           type_labels=type_labels,
-                           type_data=type_data)
+

@@ -9,8 +9,9 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
-            background-color: #f8f9fa;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5; /* soft gray */
+            margin: 0;
+            font-family: Arial, sans-serif;
         }
         .dashboard-title {
             background-color: #dc3545;
@@ -23,28 +24,46 @@
         }
         .card-counter {
             box-shadow: 2px 2px 10px #ccc;
-            margin: 10px;
             padding: 20px;
             border-radius: 10px;
             background-color: white;
             transition: 0.3s ease-in-out;
             text-align: center;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
         .card-counter:hover {
-            transform: scale(1.05);
+            transform: scale(1.03);
         }
         .card-counter h4 {
             font-weight: 600;
-        }
-        canvas {
-            max-width: 100% !important;
+            margin-bottom: 10px;
         }
         .chart-box {
-            padding: 20px;
             background: white;
             border-radius: 10px;
             box-shadow: 0 0 10px #ccc;
-            margin-bottom: 30px;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        .chart-header {
+            background-color: #b71c1c;
+            color: white;
+            font-weight: 600;
+            padding: 8px 12px;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            text-align: center;
+        }
+        .chart-body {
+            padding: 15px;
+            flex: 1;
+        }
+        .chart-body canvas {
+            max-width: 100% !important;
         }
         select {
             margin-bottom: 20px;
@@ -57,70 +76,97 @@
         <h2>Court Case Dashboard</h2>
     </div>
 
+    <!-- Year Filter -->
     <form method="GET">
-        <div class="mb-3">
-            <label for="year" class="form-label fw-semibold">Select Year:</label>
-            <select name="year" id="year" class="form-select" onchange="this.form.submit()">
+        <div class="d-flex align-items-center mb-3" style="gap: 10px;">
+            <label for="year" class="form-label fw-semibold mb-0">Select Year:</label>
+            <select name="year" style="width: 400px;" id="year" class="form-select form-select-sm w-auto" onchange="this.form.submit()">
                 <option value="All" {% if selected_year == 'All' %}selected{% endif %}>All</option>
                 {% for year in available_years %}
                     <option value="{{ year }}" {% if selected_year == year %}selected{% endif %}>{{ year }}</option>
                 {% endfor %}
             </select>
         </div>
+
     </form>
 
-    <div class="row text-center">
-        <div class="col-md-3">
-            <div class="card-counter border-primary">
+    <!-- Case Count Cards -->
+    <div class="row text-center mb-4 g-4">
+        <div class="col-md-3 d-flex">
+            <div class="card-counter border-primary w-100">
                 <h4>Total Cases</h4>
                 <h2>{{ total_cases }}</h2>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card-counter border-warning">
+        <div class="col-md-3 d-flex">
+            <div class="card-counter border-warning w-100">
                 <h4>Pending</h4>
                 <h2>{{ pending_cases }}</h2>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card-counter border-success">
+        <div class="col-md-3 d-flex">
+            <div class="card-counter border-success w-100">
                 <h4>Completed</h4>
                 <h2>{{ completed_cases }}</h2>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card-counter border-secondary">
+        <div class="col-md-3 d-flex">
+            <div class="card-counter border-secondary w-100">
                 <h4>Other</h4>
                 <h2>{{ other_cases }}</h2>
             </div>
         </div>
     </div>
 
-    <div class="row mt-4">
-        <div class="col-md-4 chart-box">
-            <h6 class="text-center">Case Queries Over Time</h6>
-            <canvas id="lineChart"></canvas>
+    <!-- Charts Row -->
+    <div class="row g-4">
+        <div class="col-md-4 d-flex">
+            <div class="chart-box w-100">
+                <div class="chart-header">Case Queries Over Time</div>
+                <div class="chart-body">
+                    <canvas id="lineChart"></canvas>
+                </div>
+            </div>
         </div>
-        <div class="col-md-4 chart-box">
-            <h6 class="text-center">Query Status Distribution</h6>
-            <canvas id="pieChart"></canvas>
+        <div class="col-md-4 d-flex">
+            <div class="chart-box w-100">
+                <div class="chart-header">Query Status Distribution</div>
+                <div class="chart-body">
+                    <canvas id="pieChart"></canvas>
+                </div>
+            </div>
         </div>
-        <div class="col-md-4 chart-box">
-            <h6 class="text-center">Top Case Types Queried</h6>
-            <canvas id="barChart"></canvas>
+        <div class="col-md-4 d-flex">
+            <div class="chart-box w-100">
+                <div class="chart-header">Top Case Types Queried</div>
+                <div class="chart-body">
+                    <canvas id="barChart"></canvas>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
+<!-- Data Injection -->
+<script>
+    var months = {{ months|default([])|tojson }};
+    var monthCounts = {{ month_counts|default([])|tojson }};
+    var statusLabels = {{ status_labels|default([])|tojson }};
+    var statusData = {{ status_data|default([])|tojson }};
+    var typeLabels = {{ type_labels|default([])|tojson }};
+    var typeData = {{ type_data|default([])|tojson }};
+</script>
+
+<!-- Chart Scripts -->
 <script>
     const lineCtx = document.getElementById('lineChart').getContext('2d');
     new Chart(lineCtx, {
         type: 'line',
         data: {
-            labels: {{ time_labels|tojson }},
+            labels: months,
             datasets: [{
                 label: 'Case Queries',
-                data: {{ time_values|tojson }},
+                data: monthCounts,
                 borderColor: 'rgba(54, 162, 235, 1)',
                 backgroundColor: 'rgba(54, 162, 235, 0.2)',
                 tension: 0.3
@@ -132,10 +178,10 @@
     new Chart(pieCtx, {
         type: 'pie',
         data: {
-            labels: {{ pie_labels|tojson }},
+            labels: statusLabels,
             datasets: [{
                 label: 'Query Status',
-                data: {{ pie_values|tojson }},
+                data: statusData,
                 backgroundColor: ['#28a745', '#ffc107', '#6c757d']
             }]
         }
@@ -145,10 +191,10 @@
     new Chart(barCtx, {
         type: 'bar',
         data: {
-            labels: {{ bar_labels|tojson }},
+            labels: typeLabels,
             datasets: [{
                 label: 'Query Count',
-                data: {{ bar_values|tojson }},
+                data: typeData,
                 backgroundColor: 'rgba(153, 102, 255, 0.6)'
             }]
         },
@@ -157,7 +203,7 @@
                 x: {
                     ticks: {
                         maxRotation: 45,
-                        minRotation: 45,
+                        minRotation: 45
                     }
                 }
             }
