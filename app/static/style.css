@@ -1,0 +1,461 @@
+/* Reset and base styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  height: 100vh;
+  color: #000;
+  animation: slideshow 30s infinite;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+body.dashboard-page {
+    background: #f5f5f5 !important;  /* override base background image */
+    background-image: none !important;
+}
+
+/* Slideshow Animation */
+@keyframes slideshow {
+  0%   { background-image: url('media/bg1.jpg'); }
+  33%  { background-image: url('media/bg2.jpg'); }
+  66%  { background-image: url('media/bg3.jpg'); }
+  100% { background-image: url('media/bg1.jpg'); }
+}
+
+/* Header styles */
+header {
+  background-color: #fff;
+  display: flex;
+  align-items: center;
+  padding: 20px 40px;
+  border-bottom: 3px solid #900;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  margin-left: 50px; /* 👈 shifts logo+title to the right */
+}
+
+.header-logo {
+  height: 100px;
+  margin-right: 20px;
+}
+.header-flag {
+    height: 120px;
+    width:120px;
+    position: absolute;
+    top: 10px;
+    right: 200px;
+}
+
+.header-title h1 {
+  margin: 0;
+  font-size: 28px;
+  color: #000;
+}
+
+.header-title h2 {
+  margin: 5px 0 0;
+  font-size: 18px;
+  color: #900;
+}
+
+
+/* Form container */
+.form-container {
+  background-color: rgba(255, 255, 255, 0.9);
+  max-width: 500px;
+  margin: 60px auto;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+}
+
+.form-container h3 {
+  margin-bottom: 20px;
+  color: #900;
+  text-align: center;
+  font-size: 22px;
+}
+
+/* Form elements */
+label {
+  display: block;
+  margin: 15px 0 5px;
+  font-weight: bold;
+}
+
+input[type="text"],
+select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #aaa;
+  border-radius: 4px;
+  font-size: 1em;
+}
+
+/* CAPTCHA area */
+.captcha-box {
+  display: flex;
+  align-items: center;
+  margin-top: 15px;
+}
+
+.captcha-box img {
+  height: 50px;
+  margin-right: 10px;
+}
+
+/* Buttons */
+.buttons {
+  text-align: center;
+  margin-top: 20px;
+}
+
+button {
+  padding: 12px 20px;
+  margin: 0 10px;
+  font-size: 1em;
+  font-weight: bold;
+  background-color: #900;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+button:hover {
+  background-color: #700;
+}
+
+/* Sticky footer base setup */
+html, body {
+  height: 100%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.footer {
+  margin-top: auto;
+  background-color: #900;
+  color: white;
+  padding: 20px 15px;
+  text-align: center;
+  font-size: 0.95rem;
+  border-top: 4px solid #f3c623;
+  box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.25);
+}
+
+.footer-content p {
+  margin: 6px 0;
+  line-height: 1.4;
+}
+
+.footer-links a {
+  color: #f3c623;
+  text-decoration: none;
+  margin: 0 6px;
+  font-weight: 500;
+}
+
+.footer-links a:hover {
+  text-decoration: underline;
+}
+
+.disclaimer {
+  font-size: 0.8rem;
+  color: #ccc;
+}
+.image-box img {
+  width: 90%;
+  max-width: 700px;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  margin-bottom: 30px;
+}
+.text-box {
+  max-width: 1200px;
+  background: #e9f1f7;
+  padding: 30px 20px;
+  border-radius: 12px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: justify;
+  font-family: 'Segoe UI', sans-serif;
+  line-height: 1.8;
+  margin: 0 auto;
+}
+
+.image-box img {
+  max-width: 100%;
+  width: 1100px;
+  height: 350px;
+  border-radius: 10px 10px 0 0; /* Optional: make the top of image match the container */
+  margin-bottom: 10px;
+}
+
+.text-box h2 {
+  font-size: 1.5em;
+  color: #2f4f75;
+  margin-bottom: 15px;
+}
+
+.text-box p {
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.about-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 160px);
+    padding: 40px 20px;
+}
+
+.about-wrapper {
+    display: flex;
+    flex-direction: row;
+    background-color: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(4px);
+    box-shadow: 0 0 18px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    max-width: 1200px;
+    width: 100%;
+    padding: 30px;
+    gap: 40px;
+}
+
+.about-text {
+    flex: 1 1 60%;
+    font-size: 1rem;
+    line-height: 1.7;
+    text-align: justify;
+}
+
+.about-text h2 {
+    margin-bottom: 20px;
+    font-size: 1.8rem;
+}
+
+.about-images {
+    flex: 1 1 40%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.about-images img {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+.about-text ul {
+    padding-left: 20px;
+    margin-top: 5px;
+}
+.error-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.error-container h1 {
+    font-size: 80px;
+    margin: 0;
+    color: #d9534f;
+}
+
+.error-container h2 {
+    font-size: 28px;
+    color: #333;
+    margin-top: 10px;
+}
+
+.error-container p {
+    color: #666;
+    font-size: 16px;
+    margin-top: 15px;
+}
+
+.error-container a {
+    display: inline-block;
+    margin-top: 25px;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+}
+
+.error-container a:hover {
+    background-color: #0056b3;
+}
+.form-container {
+    background: white;
+    max-width: 500px;
+    margin: 60px auto;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    font-family: sans-serif;
+}
+
+.form-container h3 {
+    text-align: center;
+    color: #8B0000;
+    margin-bottom: 20px;
+}
+
+.form-container label {
+    display: block;
+    margin-top: 15px;
+    font-weight: bold;
+}
+
+.form-container input,
+.form-container select {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+.captcha-box {
+    margin-top: 20px;
+}
+
+.captcha-box img {
+    display: block;
+    margin-bottom: 10px;
+}
+
+.buttons {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.buttons button {
+    padding: 10px 20px;
+    margin: 0 10px;
+    background-color: #8B0000;
+    color: white;
+    border: none;
+    border-radius: 4px;
+}
+
+.buttons button[type="reset"] {
+    background-color: #555;
+}
+.dashboard-container {
+    background: white;
+    padding-bottom: 60px;
+}
+
+.chart-box {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+/* Navbar Styles */
+.navbar {
+    background-color: #900; /* Court red */
+    padding: 10px 0;
+    width: 100%;
+    text-align: center;
+    position: relative;
+    z-index: 10; /* ensures it stays on top */
+    display: flex; !important;/* horizontal layout */
+    justify-content: center; !important;
+}
+
+/* Top-level menu */
+.navbar > ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex; !important;/* horizontal layout */
+    justify-content: center; !important; /* center main menu items */
+    align-items: center;
+    gap: 30px;
+    background-color: #900;
+}
+
+/* Top-level menu items */
+.navbar > ul > li {
+    position: relative;
+}
+
+.navbar > ul > li > a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    padding: 8px 16px;
+    display: block;
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+.navbar > ul > li:hover {
+    background-color: #700;
+}
+
+.navbar > ul > li > a:hover {
+    color: #ffddcc; /* Softer hover text color */
+}
+
+/* Submenu */
+.navbar ul ul {
+    display: none; /* hidden until hover */
+    position: absolute;
+    top: 100%;
+    left: 0;
+    flex-direction: row; /* horizontal submenu */
+    background-color: #900;
+    padding: 0;
+    margin: 0;
+    white-space: nowrap;
+    z-index: 1000;
+}
+
+/* Submenu items */
+.navbar ul ul li {
+    display: inline-block;
+}
+
+.navbar ul ul li a {
+    padding: 10px 15px;
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.navbar ul ul li a:hover {
+    background: #700;
+}
+
+/* Show submenu on hover */
+.navbar ul li:hover > ul {
+    display: flex;
+}

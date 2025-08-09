@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+{% block title %}Enter Case Details{% endblock %}
+
+{% block content %}
+<style>
+    .center-card {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 80vh;
+    }
+
+    .card-custom {
+        background-color: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+        width: 800px;
+    }
+
+    .card-custom h2 {
+        font-weight: bold;
+        margin-bottom: 15px;
+        color: #8B0000;
+    }
+
+    .btn-primary {
+        background-color: #8B0000;
+        border: none;
+    }
+
+    .btn-primary:hover {
+        background-color: #a00000;
+    }
+
+    #success-message {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background-color: #d4edda;
+        color: #155724;
+        padding: 12px 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+        font-weight: bold;
+        display: none;
+    }
+</style>
+
+{% if message is defined and message %}
+<div id="success-message">{{ message }}</div>
+<script>
+    window.onload = function () {
+        const msg = document.getElementById('success-message');
+        msg.style.display = 'block';
+        setTimeout(() => {
+            msg.style.display = 'none';
+        }, 4000);
+    }
+</script>
+{% endif %}
+
+
+
+<div class="center-card">
+    <div class="card-custom">
+        <h2 class="text-center">Case Query Details</h2>
+
+        <form method="POST" action="{{ url_for('main.add_case') }}">
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="court_complex">Court Complex</label>
+                    <select id="court_complex" name="court_complex" class="form-control" required>
+                        <option value="">--Select Court Complex--</option>
+                        <option value="Faridabad District Court">Faridabad District Court</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label for="case_type">Case Type *</label>
+                    <select id="case_type" name="case_type" class="form-control" required>
+                        <option value="">--Select Case Type--</option>
+                        <option>District & Sessions Court</option>
+                        <option>Chief Judicial Magistrate Court</option>
+                        <option>Additional District Court</option>
+                        <option>Senior Civil Judge Court</option>
+                        <option>Junior Civil Judge Court</option>
+                        <option>Family Court (District Level)</option>
+                        <option>Fast Track District Court</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label for="case_number">Case Number *</label>
+                    <input type="text" class="form-control" id="case_number"
+                           name="case_number" value="{{ case_number}}" readonly required>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="filing_year">Filing Year *</label>
+                    <select name="filing_year" id="filing_year" class="form-control" required>
+                        <option value="" disabled selected>--Select year--</option>
+                        {% for year in range(2000, current_year + 1) %}
+                            <option value="{{ year }}">{{ year }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label for="state">State</label>
+                    <input type="text" class="form-control" id="state" name="state">
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="district">District</label>
+                    <input type="text" class="form-control" id="district" name="district">
+                </div>
+            </div>
+
+            <!-- Hidden auto-filled field -->
+            <input type="hidden" id="filing_date" name="filing_date">
+            <br>
+            <div class="d-flex justify-content-between mt-4">
+                <button type="submit" class="btn btn-primary">Next</button>
+                <button type="reset" class="btn btn-secondary">Reset</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Automatically set filing date (hidden input)
+    const today = new Date();
+    document.getElementById("filing_date").value = today.toISOString().split('T')[0];
+</script>
+{% endblock %}

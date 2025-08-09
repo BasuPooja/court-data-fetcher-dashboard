@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}About Project | District Court Faridabad{% endblock %}
+
+{% block content %}
+<div class="about-container">
+    <div class="about-wrapper">
+        <!-- Left Text Section -->
+        <div class="about-text">
+            <h2>About the Project</h2>
+            <p>
+                The Court Data Fetcher & Mini-Dashboard project is a web-based platform designed to simplify access to court case details from the Faridabad District Court.
+                Users can input a case number and retrieve case status, petitioner/respondent names, next hearing date, and other metadata.
+            </p>
+            <p>
+                Built with Flask and Python, this tool integrates web scraping (via Selenium) to fetch real-time data directly from the official court website.
+                Each query is also logged into a database for record-keeping and analysis. The application features a user-friendly interface and a live dashboard
+                to display search trends.
+            </p>
+            <ul>
+                <li>Simple case status lookup by case number</li>
+                <li>Dashboard displaying recent activity</li>
+                <li>Persistent search logging to database</li>
+                <li>Clean and professional UI with modular routing</li>
+            </ul>
+            <p>
+                This project is ideal for law firms, legal researchers, and citizens who need quick access to court case information.
+                Future expansions may include support for additional courts, downloadable case reports, and notification alerts for hearing updates.
+            </p>
+        </div>
+
+        <!-- Right Image Section -->
+        <div class="about-images">
+            <img src="{{ url_for('static', filename='media/court1.jpg') }}" alt="Courtroom Image 1">
+            <img src="{{ url_for('static', filename='media/court2.jpg') }}" alt="Courtroom Image 2">
+        </div>
+    </div>
+</div>
+{% endblock %}
