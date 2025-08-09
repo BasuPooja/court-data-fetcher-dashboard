@@ -134,42 +134,6 @@ button {
 button:hover {
   background-color: #700;
 }
-/* Navbar Styles */
-.navbar {
-  background-color: #900; /* Court red */
-  padding: 10px 0;
-  width: 100%;
-  text-align: center;
-  position: relative;
-  z-index: 10; /* ensures it stays on top */
-}
-
-.navbar ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: inline-flex;
-  justify-content: center;
-  gap: 30px;
-}
-
-.navbar li {
-  display: inline;
-}
-
-.navbar a {
-  color: white;
-  text-decoration: none;
-  font-weight: bold;
-  padding: 8px 16px;
-  display: inline-block;
-  transition: background 0.3s ease;
-}
-
-.navbar a:hover {
-  background-color: #555;
-  border-radius: 4px;
-}
 
 /* Sticky footer base setup */
 html, body {
@@ -413,4 +377,85 @@ body {
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+/* Navbar Styles */
+.navbar {
+    background-color: #900; /* Court red */
+    padding: 10px 0;
+    width: 100%;
+    text-align: center;
+    position: relative;
+    z-index: 10; /* ensures it stays on top */
+    display: flex; !important;/* horizontal layout */
+    justify-content: center; !important;
+}
+
+/* Top-level menu */
+.navbar > ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex; !important;/* horizontal layout */
+    justify-content: center; !important; /* center main menu items */
+    align-items: center;
+    gap: 30px;
+    background-color: #900;
+}
+
+/* Top-level menu items */
+.navbar > ul > li {
+    position: relative;
+}
+
+.navbar > ul > li > a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    padding: 8px 16px;
+    display: block;
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+.navbar > ul > li:hover {
+    background-color: #700;
+}
+
+.navbar > ul > li > a:hover {
+    color: #ffddcc; /* Softer hover text color */
+}
+
+/* Submenu */
+.navbar ul ul {
+    display: none; /* hidden until hover */
+    position: absolute;
+    top: 100%;
+    left: 0;
+    flex-direction: row; /* horizontal submenu */
+    background-color: #900;
+    padding: 0;
+    margin: 0;
+    white-space: nowrap;
+    z-index: 1000;
+}
+
+/* Submenu items */
+.navbar ul ul li {
+    display: inline-block;
+}
+
+.navbar ul ul li a {
+    padding: 10px 15px;
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.navbar ul ul li a:hover {
+    background: #700;
+}
+
+/* Show submenu on hover */
+.navbar ul li:hover > ul {
+    display: flex;
 }

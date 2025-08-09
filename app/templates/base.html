@@ -24,16 +24,29 @@
 </header>
 
 
-    <!-- Navbar -->
-    <nav class="navbar">
+   <nav class="navbar">
         <ul>
-    <li><a href="{{ url_for('main.home') }}">Home</a></li>
-    <li><a href="{{ url_for('main.about_project') }}">About Project</a></li>
-    <li><a href="{{ url_for('main.enter_case') }}">Case Add</a></li>
-    <li><a href="{{ url_for('main.fetch_case') }}">Case Status</a></li>
-    <li><a href="{{ url_for('main.dashboard') }}">Dashboard</a></li>
-</ul>
+            <li><a href="{{ url_for('main.home') }}">Home</a></li>
+            <li><a href="{{ url_for('main.about_project') }}">About Project</a></li>
 
+            <!-- Case History Dropdown -->
+            <li class="dropdown">
+                <a href="#">Case History</a>
+                <ul class="dropdown-content">
+                    <li><a href="{{ url_for('main.enter_case') }}">Case Add</a></li>
+                    <li><a href="{{ url_for('main.fetch_case') }}">Case Status</a></li>
+                </ul>
+            </li>
+
+            <li class="dropdown">
+                <a href="#">View Case</a>
+                <ul class="dropdown-content">
+                    <li><a href="{{ url_for('main.dashboard') }}">Dashboard</a></li>
+                    <li><a href="{{ url_for('main.case_list') }}">Case List</a></li>
+                </ul>
+            </li>
+
+        </ul>
     </nav>
 
     <!-- Content -->

@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<head>
+    <title>Case List</title>
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .table-container {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        h2 {
+            font-weight: 700;
+            font-size: 26px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #b30000;
+            color: #b30000;
+            margin-bottom: 20px;
+        }
+        table {
+            table-layout: fixed;
+        }
+        table thead {
+            background-color: #b30000 !important;
+            color: white;
+        }
+        table th, table td {
+            vertical-align: middle;
+            text-align: center;
+            font-size: 17px;
+            padding: 18px 10px;
+            word-wrap: break-word;
+        }
+        table tbody tr:hover {
+            background-color: #fceaea;
+            transition: background-color 0.2s ease-in-out;
+        }
+        button.btn-primary {
+            background-color: #b30000;
+            border-color: #b30000;
+            font-size: 14px;
+            padding: 6px 12px;
+        }
+        button.btn-primary:hover {
+            background-color: #8c0000;
+            border-color: #8c0000;
+        }
+        .collapse {
+            border-top: 1px solid #dee2e6;
+            text-align: left;
+            font-size: 16px;
+            padding: 10px;
+        }
+        /* Increased column widths */
+        th:nth-child(1) { width: 22%; }
+        th:nth-child(2) { width: 10%; }
+        th:nth-child(3), th:nth-child(4) { width: 14%; }
+        th:nth-child(5) { width: 12%; }
+        th:nth-child(6), th:nth-child(7) { width: 11%; }
+        th:nth-child(8), th:nth-child(9) { width: 10%; }
+        th:nth-child(10) { width: 8%; }
+        /* Pagination styling */
+        .pagination .page-link {
+            color: #b30000;
+        }
+        .pagination .page-item.active .page-link {
+            background-color: #b30000;
+            border-color: #b30000;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container mt-4">
+    <div class="table-container">
+        <h2>Court Case List</h2>
+
+        <table class="table table-bordered table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>Case Number</th>
+                    <th>Status</th>
+                    <th>Petitioner</th>
+                    <th>Respondent</th>
+                    <th>Advocate</th>
+                    <th>Next Hearing</th>
+                    <th>Judgment Date</th>
+                    <th>State</th>
+                    <th>District</th>
+                    <th>Details</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for case in cases %}
+                <tr>
+                    <td>{{ case.case_type }} {{ case.case_number }}/{{ case.filing_year }}</td>
+                    <td>{{ case.status or '' }}</td>
+                    <td>{{ case.case_detail.petitioner if case.case_detail else '' }}</td>
+                    <td>{{ case.case_detail.respondent if case.case_detail else '' }}</td>
+                    <td>{{ case.case_detail.advocate_name if case.case_detail else '' }}</td>
+                    <td>{{ case.case_detail.next_hearing_date if case.case_detail else '' }}</td>
+                    <td>{{ case.case_detail.judgment_date if case.case_detail else '' }}</td>
+                    <td>{{ case.state or '' }}</td>
+                    <td>{{ case.district or '' }}</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary" data-bs-toggle="collapse"
+                                data-bs-target="#details-{{ case.id }}">
+                            View
+                        </button>
+                    </td>
+                </tr>
+                <tr class="collapse bg-light" id="details-{{ case.id }}">
+                    <td colspan="10">
+                        <strong>Registration No:</strong> {{ case.case_detail.registration_number if case.case_detail else '' }}<br>
+                        <strong>Registration Date:</strong> {{ case.case_detail.registration_date if case.case_detail else '' }}<br>
+                        <strong>Court Complex:</strong> {{ case.court_complex or '' }}<br>
+                        <strong>Remark:</strong> {{ case.case_detail.Remark if case.case_detail else '' }}<br>
+                        <strong>Query Time:</strong> {{ case.query_time.strftime('%Y-%m-%d %H:%M:%S') if case.query_time else '' }}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Pagination -->
+        {% if pagination.pages > 1 %}
+        <nav aria-label="Case list pagination">
+            <ul class="pagination justify-content-center">
+                {% if pagination.has_prev %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('main.case_list', page=pagination.prev_num) }}">Previous</a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled"><span class="page-link">Previous</span></li>
+                {% endif %}
+
+                {% for p in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                    {% if p %}
+                        {% if p == pagination.page %}
+                            <li class="page-item active"><span class="page-link">{{ p }}</span></li>
+                        {% else %}
+                            <li class="page-item"><a class="page-link" href="{{ url_for('main.case_list', page=p) }}">{{ p }}</a></li>
+                        {% endif %}
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">…</span></li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if pagination.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('main.case_list', page=pagination.next_num) }}">Next</a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled"><span class="page-link">Next</span></li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+{% endblock %}

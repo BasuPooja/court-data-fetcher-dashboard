@@ -18,9 +18,9 @@ import os
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from jinja2 import StrictUndefined
+from flask import current_app
 
 
-# Get absolute path to font file
 font_path = os.path.join(os.path.dirname(__file__), 'static', 'fonts', 'NotoSansDevanagari-Regular.ttf')
 pdfmetrics.registerFont(TTFont('NotoSansDevanagari', font_path))
 
@@ -73,8 +73,13 @@ def enter_case():
 
         message = "Case and parsed details submitted successfully."
         return render_template('addCase.html', message=message, current_year=current_year, filing_year=filing_year)
-
-    return render_template('addCase.html', current_year=current_year, filing_year=filing_year)
+    generated_case_number = generate_case_number()
+    return render_template(
+        'addCase.html',
+        current_year=datetime.now().year,
+        case_number=generated_case_number,
+        filing_year=filing_year
+    )
 
 def generate_case_number():
     now = datetime.now()
@@ -84,6 +89,8 @@ def generate_case_number():
 
 @main.route('/add_case', methods=['GET', 'POST'])
 def add_case():
+    generated_case_number = generate_case_number()
+
     if request.method == 'POST':
         new_case = CaseQuery(
             case_type=request.form['case_type'],
@@ -97,10 +104,11 @@ def add_case():
         db.session.commit()
         return redirect(url_for('main.add_parsed_case', query_id=new_case.id))
 
-    generated_case_number = generate_case_number()
-    return render_template('addCase.html',
-                           current_year=datetime.now().year,
-                           case_number=generated_case_number)
+    return render_template(
+        'addCase.html',
+        current_year=datetime.now().year,
+        case_number=generated_case_number
+    )
 
 def generate_registration_number():
     now = datetime.now()
@@ -117,18 +125,17 @@ def add_parsed_case(query_id):
             registration_number=request.form.get('registration_number'),
             registration_date=request.form.get('registration_date'),
             judgment_date=request.form.get('judgment_date'),
-            # petitioner=request.form.get('petitioner'),
-            # respondent=request.form.get('respondent'),
-            # advocate_name=request.form.get('advocate_name'),
-            petitioner = faker.company(),
-            respondent = faker.company(),
-            advocate_name = faker.name(),
+            petitioner=request.form.get('petitioner'),
+            respondent=request.form.get('respondent'),
+            advocate_name=request.form.get('advocate_name'),
+            # petitioner = faker.company(),
+            # respondent = faker.company(),
+            # advocate_name = faker.name(),
             next_hearing_date=faker.date_between(start_date='today', end_date='+30d').strftime('%Y-%m-%d')
         )
         db.session.add(parsed)
         db.session.commit()
-        flash("✅ Parsed case details saved successfully!")
-        return redirect(url_for('main.add_case'))  # Redirect to add_case page
+        return redirect(url_for('main.add_case' ))  # Redirect to add_case page
 
     # Always return a response
     generated_registration_number = generate_registration_number()
@@ -152,156 +159,6 @@ def generate_order_pdf(query_id):
     response.headers['Content-Type'] = 'application/pdf'
     response.headers['Content-Disposition'] = f'attachment; filename=Judgment_{query.case_number}.pdf'
     return response
-#
-# @main.route('/captcha')
-# def generate_captcha():
-#     # Captcha configuration
-#     characters = string.ascii_uppercase + string.digits
-#     captcha_text = ''.join(random.choices(characters, k=6))
-#     session['captcha'] = captcha_text
-#
-#     # Image settings
-#     width, height = 180, 60
-#     background_color = (230, 230, 255)  # Light purple/blue tone
-#     image = Image.new('RGB', (width, height), background_color)
-#     draw = ImageDraw.Draw(image)
-#
-#     # Font setup
-#     try:
-#         font = ImageFont.truetype("arial.ttf", 36)
-#     except IOError:
-#         font = ImageFont.load_default()
-#
-#     # Draw border
-#     draw.rectangle([(0, 0), (width - 1, height - 1)], outline=(80, 80, 150), width=2)
-#
-#     # Draw CAPTCHA text with random spacing and colors
-#     for i, char in enumerate(captcha_text):
-#         x = 10 + i * 25 + random.randint(-2, 2)
-#         y = random.randint(5, 15)
-#         draw.text((x, y), char, font=font, fill=(random.randint(0, 100), 0, random.randint(150, 255)))
-#
-#     # Add noise - random lines
-#     for _ in range(8):
-#         x1 = random.randint(0, width)
-#         y1 = random.randint(0, height)
-#         x2 = random.randint(0, width)
-#         y2 = random.randint(0, height)
-#         draw.line([(x1, y1), (x2, y2)], fill=(150, 150, 255), width=2)
-#
-#     # Add noise - random dots
-#     for _ in range(150):
-#         x = random.randint(0, width)
-#         y = random.randint(0, height)
-#         draw.point((x, y), fill=(random.randint(150, 255), random.randint(150, 255), random.randint(150, 255)))
-#
-#     # Apply filter to slightly distort image
-#     image = image.filter(ImageFilter.GaussianBlur(0.5))
-#
-#     # Serve image as response
-#     buffer = BytesIO()
-#     image.save(buffer, 'PNG')
-#     buffer.seek(0)
-#     return send_file(buffer, mimetype='image/png')
-#
-# def absolute_path(relative_path):
-#     return os.path.abspath(os.path.join('app', relative_path))
-#
-#
-# @main.route('/fetch-case', methods=['GET', 'POST'])
-# def fetch_case():
-#     if request.method == 'POST':
-#         # --- 1. Validate Captcha ---
-#         user_captcha = request.form.get('captcha')
-#         expected_captcha = session.get('captcha')
-#
-#         if not user_captcha or user_captcha.upper() != expected_captcha:
-#             flash("❌ Invalid captcha. Please try again.", "danger")
-#             return redirect(url_for('main.fetch_case'))
-#
-#         # --- 2. Read form fields ---
-#         case_type = request.form['case_type']
-#         case_number = request.form['case_number']
-#         filing_year = request.form['year']
-#         court_complex = request.form['court_complex']
-#
-#         # --- 3. Fetch from DB ---
-#         query_obj = CaseQuery.query.filter_by(
-#             case_type=case_type,
-#             case_number=case_number,
-#             filing_year=filing_year,
-#             court_complex=court_complex
-#         ).first()
-#
-#         if not query_obj:
-#             flash("⚠️ No matching case found in database.", "warning")
-#             return redirect(url_for('main.fetch_case'))
-#
-#         details_obj = ParsedCaseDetails.query.filter_by(
-#             query_id=query_obj.id
-#         ).first()
-#
-#         # --- 4. Prepare data for template ---
-#         query_data = {
-#             "id": query_obj.id,
-#             "case_type": query_obj.case_type,
-#             "case_number": query_obj.case_number,
-#             "filing_year": query_obj.filing_year,
-#             "court_complex": query_obj.court_complex,
-#             "state": query_obj.state,
-#             "district": query_obj.district,
-#             "query_time": query_obj.query_time,
-#             "status": query_obj.status
-#         }
-#
-#         details_data = {}
-#         if details_obj:
-#             details_data = {
-#                 "registration_number": details_obj.registration_number,
-#                 "registration_date": details_obj.registration_date,
-#                 "judgment_date": details_obj.judgment_date,
-#                 "petitioner": details_obj.petitioner,
-#                 "respondent": details_obj.respondent,
-#                 "advocate_name": details_obj.advocate_name,
-#                 "next_hearing_date": details_obj.next_hearing_date,
-#                 "Remark": details_obj.Remark
-#             }
-#
-#         # --- 5. Absolute paths for images ---
-#         logo_path = absolute_path('static/media/logo.png')
-#         flag_path = absolute_path('static/media/flag.png')
-#
-#         # --- 6. Render HTML ---
-#         html = render_template(
-#             'GeneratedReport.html',
-#             query=query_data,
-#             details=details_data,
-#             current_date=datetime.now().strftime('%d-%m-%Y'),
-#             logo_path=logo_path,
-#             flag_path=flag_path
-#         )
-#
-#         # --- 7. Generate PDF ---
-#         pdf_buffer = BytesIO()
-#         pisa.CreatePDF(html, dest=pdf_buffer)
-#         pdf_buffer.seek(0)
-#
-#         # --- 8. Send PDF to browser ---
-#         return send_file(
-#             pdf_buffer,
-#             mimetype='application/pdf',
-#             download_name=f"Order_Summary_{query_data['id']}.pdf",
-#             as_attachment=True
-#         )
-#
-#     # --- GET request: show form with new captcha ---
-#     captcha_text = generate_captcha()
-#     return render_template('fetch_case.html', captcha_text=captcha_text)
-#
-# @main.route('/new-captcha')
-# def new_captcha():
-#     captcha = generate_captcha()
-#     return captcha
 
 @main.route('/dashboard')
 def dashboard():
@@ -443,14 +300,18 @@ def captcha_image():
     buffer.seek(0)
     return send_file(buffer, mimetype='image/png')
 
+@main.route('/new-captcha')
+def new_captcha():
+    create_captcha_text()
+    return redirect(url_for('main.fetch_case'))
 
-# -------------------- UTILS --------------------
 def absolute_path(relative_path):
-    return os.path.abspath(os.path.join('app', relative_path))
+    return os.path.abspath(os.path.join(current_app.root_path, relative_path))
+
 @main.route('/fetch-case', methods=['GET', 'POST'])
 def fetch_case():
     if request.method == 'POST':
-        # --- 1. Validate Captcha ---
+        # 1. Validate Captcha
         user_captcha = request.form.get('captcha')
         expected_captcha = session.get('captcha')
 
@@ -458,13 +319,13 @@ def fetch_case():
             flash("❌ Invalid captcha. Please try again.", "danger")
             return redirect(url_for('main.fetch_case'))
 
-        # --- 2. Read form fields ---
+        # 2. Read form fields
         case_type = request.form['case_type'].strip()
         case_number = request.form['case_number'].strip()
         filing_year = request.form['year'].strip()
-        court_complex = request.form['court_complex'].strip()  # not filtering
+        court_complex = request.form['court_complex'].strip()
 
-        # --- 3. Fetch from DB (no court_complex filter) ---
+        # 3. Fetch query
         query_obj = CaseQuery.query.filter_by(
             case_type=case_type,
             case_number=case_number,
@@ -475,12 +336,11 @@ def fetch_case():
             flash("⚠️ No matching case found in database.", "warning")
             return redirect(url_for('main.fetch_case'))
 
-        # --- 3b. Fetch related case details ---
+        # 4. Fetch details
         details_obj = db.session.query(ParsedCaseDetails).filter(
             ParsedCaseDetails.query_id == query_obj.id
         ).first()
 
-        # --- 4. Prepare data for template ---
         query_data = {
             "id": query_obj.id,
             "case_type": query_obj.case_type,
@@ -506,38 +366,54 @@ def fetch_case():
                 "Remark": details_obj.Remark
             }
 
-        # --- 5. Absolute paths for images ---
-        logo_path = absolute_path('static/media/logo.png')
-        flag_path = absolute_path('static/media/flag.png')
+        # 5. Paths for PDF (absolute)
+        logo_abs_path = absolute_path('static/media/logo.png')
+        flag_abs_path = absolute_path('static/media/flag.png')
 
-        # --- 6. Render HTML for PDF ---
-        html = render_template(
+        # 6. PDF absolute save path
+        pdf_filename = f"Order_Summary_{query_data['id']}.pdf"
+        pdf_dir = absolute_path('static/reports')
+        os.makedirs(pdf_dir, exist_ok=True)
+        pdf_abs_path = os.path.join(pdf_dir, pdf_filename)
+
+        # 7. HTML for PDF (no download link in PDF)
+        html_for_pdf = render_template(
             'GeneratedReport.html',
             query=query_data,
             details=details_data,
-            current_date=datetime.now().strftime('%d-%m-%Y'),
-            logo_path=logo_path,
-            flag_path=flag_path
+            current_date=datetime.now().strftime('%d-%m-%Y %H:%M'),
+            logo_path=logo_abs_path,
+            flag_path=flag_abs_path,
+            pdf_url=None,
+            auto_open_pdf = False
         )
 
-        # --- 7. Generate PDF file ---
-        pdf_filename = f"Order_Summary_{query_data['id']}.pdf"
-        pdf_path = os.path.join("static", "reports", pdf_filename)
+        with open(pdf_abs_path, "wb") as f:
+            pisa.CreatePDF(html_for_pdf, dest=f)
 
-        os.makedirs(os.path.dirname(pdf_path), exist_ok=True)
-        with open(pdf_path, "wb") as f:
-            pisa.CreatePDF(html, dest=f)
+        # 8. Browser URL for the saved PDF
+        pdf_url = url_for("static", filename=f"reports/{pdf_filename}")
 
-        # --- 8. Show PDF in browser with download option ---
+        # 9. Render preview with working link
         return render_template(
-            "view_pdf.html",
-            pdf_url=url_for("static", filename=f"reports/{pdf_filename}")
+            "GeneratedReport.html",
+            query=query_data,
+            details=details_data,
+            current_date=datetime.now().strftime('%d-%m-%Y %H:%M'),
+            logo_path=url_for('static', filename='media/logo.png'),
+            flag_path=url_for('static', filename='media/flag.png'),
+            pdf_url=pdf_url,
+            auto_open_pdf=True
         )
 
-    # --- GET request ---
     return render_template('fetch_case.html')
 
-@main.route('/new-captcha')
-def new_captcha():
-    create_captcha_text()
-    return redirect(url_for('main.fetch_case'))
+@main.route('/case-list')
+def case_list():
+    page = request.args.get('page', 1, type=int)
+    per_page = 10  # cases per page
+
+    pagination = CaseQuery.query.order_by(CaseQuery.id.desc()).paginate(page=page, per_page=per_page, error_out=False)
+    cases = pagination.items
+
+    return render_template('case_list.html', cases=cases, pagination=pagination)

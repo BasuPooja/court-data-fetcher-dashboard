@@ -48,7 +48,7 @@
     }
 </style>
 
-{% if message %}
+{% if message is defined and message %}
 <div id="success-message">{{ message }}</div>
 <script>
     window.onload = function () {
@@ -60,6 +60,8 @@
     }
 </script>
 {% endif %}
+
+
 
 <div class="center-card">
     <div class="card-custom">
@@ -90,7 +92,7 @@
                 <div class="col-md-6">
                     <label for="case_number">Case Number *</label>
                     <input type="text" class="form-control" id="case_number"
-                           name="case_number" value="{{ case_number }}" readonly required>
+                           name="case_number" value="{{ case_number}}" readonly required>
                 </div>
             </div>
 
