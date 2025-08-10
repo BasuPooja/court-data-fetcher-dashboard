@@ -35,73 +35,47 @@ def home():
 @main.route('/about-project')
 def about_project():
     return render_template('aboutProject.html')
-
-@main.route('/enter_case', methods=['GET', 'POST'])
-def enter_case():
-    current_year = datetime.now().year
-    filing_year = ""
-
-    if request.method == 'POST':
-        case_type = request.form['case_type']
-        case_number = request.form['case_number']
-        filing_year = request.form['filing_year']
-
-        # 1. Insert into CaseQuery
-        new_query = CaseQuery(
-            case_type=case_type,
-            case_number=case_number,
-            filing_year=filing_year
-        )
-        db.session.add(new_query)
-        db.session.commit()
-
-        # 2. Get auto-generated case_id
-        case_id = new_query.id
-
-        # 3. Auto-generate data for ParsedCaseDetails
-        parsed = ParsedCaseDetails(
-            query_id=case_id,
-            petitioner=faker.company(),
-            respondent=faker.company(),
-            filing_date=str(datetime.now().date()),  # or use faker.date()
-            advocate_name=f"Adv. {faker.name()}",
-            next_hearing_date=faker.date_between(start_date='today', end_date='+30d').strftime('%Y-%m-%d'),
-            latest_pdf_link=f"https://example.com/case/{case_id}/latest.pdf"  # dummy link
-        )
-        db.session.add(parsed)
-        db.session.commit()
-
-        message = "Case and parsed details submitted successfully."
-        return render_template('addCase.html', message=message, current_year=current_year, filing_year=filing_year)
-    generated_case_number = generate_case_number()
-    return render_template(
-        'addCase.html',
-        current_year=datetime.now().year,
-        case_number=generated_case_number,
-        filing_year=filing_year
-    )
-
-def generate_case_number():
-    now = datetime.now()
-    year_month = now.strftime('%Y%m')
-    random_number = random.randint(1000, 9999)
-    return f'CASE-{year_month}-{random_number}'
-
 @main.route('/add_case', methods=['GET', 'POST'])
 def add_case():
     generated_case_number = generate_case_number()
 
     if request.method == 'POST':
+        case_type = request.form['case_type']
+        case_number = request.form['case_number'] or generated_case_number
+        filing_year = request.form['filing_year']
+        state = request.form.get('state')
+        district = request.form.get('district')
+        court_complex = request.form.get('court_complex')
+
+        # ✅ Check for duplicates
+        existing_case = CaseQuery.query.filter_by(
+            case_type=case_type,
+            case_number=case_number,
+            filing_year=filing_year
+        ).first()
+
+        if existing_case:
+            flash("⚠️ Case already exists in database.", "warning")
+            return render_template(
+                'addCase.html',
+                current_year=datetime.now().year,
+                case_number=generated_case_number
+            )
+
+        # ✅ Add new case
         new_case = CaseQuery(
-            case_type=request.form['case_type'],
-            case_number=request.form['case_number'],
-            filing_year=request.form['filing_year'],
-            state=request.form.get('state'),
-            district=request.form.get('district'),
-            court_complex=request.form.get('court_complex'),
+            case_type=case_type,
+            case_number=case_number,
+            filing_year=filing_year,
+            state=state,
+            district=district,
+            court_complex=court_complex,
+            raw_response=request.form.get('raw_response', '')  # optional
         )
         db.session.add(new_case)
         db.session.commit()
+
+        flash("✅ Case added. Please enter parsed details.", "success")
         return redirect(url_for('main.add_parsed_case', query_id=new_case.id))
 
     return render_template(
@@ -110,38 +84,49 @@ def add_case():
         case_number=generated_case_number
     )
 
-def generate_registration_number():
-    now = datetime.now()
-    year_month = now.strftime('%Y%m')
-    random_number = random.randint(1000, 9999)
-    return f'REG-{random_number}'
 
 @main.route('/add_parsed_case/<int:query_id>', methods=['GET', 'POST'])
 def add_parsed_case(query_id):
-    message = None
+    generated_registration_number = generate_registration_number()
+
     if request.method == 'POST':
+        registration_number = request.form.get('registration_number') or generated_registration_number
+
         parsed = ParsedCaseDetails(
             query_id=query_id,
-            registration_number=request.form.get('registration_number'),
+            registration_number=registration_number,
             registration_date=request.form.get('registration_date'),
             judgment_date=request.form.get('judgment_date'),
             petitioner=request.form.get('petitioner'),
             respondent=request.form.get('respondent'),
             advocate_name=request.form.get('advocate_name'),
-            # petitioner = faker.company(),
-            # respondent = faker.company(),
-            # advocate_name = faker.name(),
-            next_hearing_date=faker.date_between(start_date='today', end_date='+30d').strftime('%Y-%m-%d')
+            next_hearing_date=request.form.get('next_hearing_date'),
+            remark=request.form.get('remark')
         )
         db.session.add(parsed)
         db.session.commit()
-        return redirect(url_for('main.add_case' ))  # Redirect to add_case page
 
-    # Always return a response
-    generated_registration_number = generate_registration_number()
-    return render_template('add_parsed_details.html', query_id=query_id,
-                           registration_number=generated_registration_number)
- # adjust import as needed
+        flash("✅ Parsed case details saved successfully.", "success")
+        return redirect(url_for('main.add_case'))
+
+    return render_template(
+        'add_parsed_details.html',
+        query_id=query_id,
+        registration_number=generated_registration_number
+    )
+
+
+def generate_case_number():
+    now = datetime.now()
+    year_month = now.strftime('%Y%m')
+    random_number = random.randint(1000, 9999)
+    return f'CASE-{year_month}-{random_number}'
+
+
+def generate_registration_number():
+    now = datetime.now()
+    random_number = random.randint(1000, 9999)
+    return f'REG-{random_number}'
 
 @main.route('/generate_order_pdf/<int:query_id>')
 def generate_order_pdf(query_id):
@@ -257,8 +242,8 @@ def create_captcha_text():
 
 @main.route('/captcha')
 def captcha_image():
-    """Serve the CAPTCHA image based on session['captcha']."""
-    captcha_text = session.get('captcha', create_captcha_text())
+    # Always create a fresh captcha text for each request
+    captcha_text = create_captcha_text()
 
     # Image settings
     width, height = 180, 60
@@ -279,7 +264,8 @@ def captcha_image():
     for i, char in enumerate(captcha_text):
         x = 10 + i * 25 + random.randint(-2, 2)
         y = random.randint(5, 15)
-        draw.text((x, y), char, font=font, fill=(random.randint(0, 100), 0, random.randint(150, 255)))
+        draw.text((x, y), char, font=font,
+                  fill=(random.randint(0, 100), 0, random.randint(150, 255)))
 
     # Noise - lines
     for _ in range(8):
@@ -290,7 +276,10 @@ def captcha_image():
     # Noise - dots
     for _ in range(150):
         x, y = random.randint(0, width), random.randint(0, height)
-        draw.point((x, y), fill=(random.randint(150, 255), random.randint(150, 255), random.randint(150, 255)))
+        draw.point((x, y),
+                   fill=(random.randint(150, 255),
+                         random.randint(150, 255),
+                         random.randint(150, 255)))
 
     # Slight blur
     image = image.filter(ImageFilter.GaussianBlur(0.5))
@@ -308,24 +297,44 @@ def new_captcha():
 def absolute_path(relative_path):
     return os.path.abspath(os.path.join(current_app.root_path, relative_path))
 
+
+@main.route('/case-list')
+def case_list():
+    page = request.args.get('page', 1, type=int)
+    per_page = 10  # cases per page
+
+    pagination = CaseQuery.query.order_by(CaseQuery.id.desc()).paginate(page=page, per_page=per_page, error_out=False)
+    cases = pagination.items
+
+    return render_template('case_list.html', cases=cases, pagination=pagination)
+
 @main.route('/fetch-case', methods=['GET', 'POST'])
 def fetch_case():
     if request.method == 'POST':
-        # 1. Validate Captcha
         user_captcha = request.form.get('captcha')
         expected_captcha = session.get('captcha')
 
+        form_data = {
+            'court_complex': request.form.get('court_complex', ''),
+            'case_type': request.form.get('case_type', ''),
+            'case_number': request.form.get('case_number', ''),
+            'year': request.form.get('year', '')
+        }
+
         if not user_captcha or user_captcha.strip().upper() != expected_captcha:
             flash("❌ Invalid captcha. Please try again.", "danger")
-            return redirect(url_for('main.fetch_case'))
+            create_captcha_text()
+            return render_template('fetch_case.html', form_data=form_data)
 
-        # 2. Read form fields
-        case_type = request.form['case_type'].strip()
-        case_number = request.form['case_number'].strip()
-        filing_year = request.form['year'].strip()
-        court_complex = request.form['court_complex'].strip()
+        case_type = form_data['case_type'].strip()
+        case_number = form_data['case_number'].strip()
+        filing_year = form_data['year'].strip()
+        court_complex = form_data['court_complex'].strip()
 
-        # 3. Fetch query
+        # ✅ Always initialize defaults
+        latest_pdf_link = ""
+        raw_html = ""
+
         query_obj = CaseQuery.query.filter_by(
             case_type=case_type,
             case_number=case_number,
@@ -333,13 +342,60 @@ def fetch_case():
         ).first()
 
         if not query_obj:
-            flash("⚠️ No matching case found in database.", "warning")
-            return redirect(url_for('main.fetch_case'))
+            scraped_result = fetch_case_data(case_type, case_number, filing_year, court_complex)
 
-        # 4. Fetch details
-        details_obj = db.session.query(ParsedCaseDetails).filter(
-            ParsedCaseDetails.query_id == query_obj.id
-        ).first()
+            if not scraped_result:
+                flash("⚠️ Case not found online or site unavailable.", "warning")
+                return render_template('fetch_case.html', form_data=form_data)
+
+            raw_html = scraped_result.get("raw_html", "")
+            latest_pdf_link = scraped_result.get("latest_pdf_link", "")
+
+            if not scraped_result.get("registration_number"):
+                flash("⚠️ Registration number not available for this case.", "warning")
+
+            query_obj = CaseQuery(
+                case_type=case_type,
+                case_number=case_number,
+                filing_year=filing_year,
+                court_complex=court_complex,
+                status=scraped_result.get("status", "Pending"),
+                raw_response=raw_html,
+                state=scraped_result.get("state"),
+                district=scraped_result.get("district")
+            )
+            db.session.add(query_obj)
+            db.session.commit()
+
+            details_obj = ParsedCaseDetails(
+                query_id=query_obj.id,
+                registration_number=scraped_result.get("registration_number", ""),
+                registration_date=scraped_result.get("registration_date", ""),
+                judgment_date=scraped_result.get("judgment_date", ""),
+                petitioner=scraped_result.get("petitioner", ""),
+                respondent=scraped_result.get("respondent", ""),
+                advocate_name=scraped_result.get("advocate_name", ""),
+                next_hearing_date=scraped_result.get("next_hearing_date", ""),
+                remark=scraped_result.get("remark", "")
+            )
+            db.session.add(details_obj)
+            db.session.commit()
+        else:
+            raw_html = query_obj.raw_response or ""
+            details_obj = db.session.query(ParsedCaseDetails).filter_by(query_id=query_obj.id).first()
+            # ✅ Ensure latest_pdf_link is at least empty string when loaded from DB
+            latest_pdf_link = ""
+
+        details_data = {
+            "registration_number": getattr(details_obj, "registration_number", ""),
+            "registration_date": getattr(details_obj, "registration_date", ""),
+            "judgment_date": getattr(details_obj, "judgment_date", ""),
+            "petitioner": getattr(details_obj, "petitioner", ""),
+            "respondent": getattr(details_obj, "respondent", ""),
+            "advocate_name": getattr(details_obj, "advocate_name", ""),
+            "next_hearing_date": getattr(details_obj, "next_hearing_date", ""),
+            "remark": getattr(details_obj, "Remark", "")
+        }
 
         query_data = {
             "id": query_obj.id,
@@ -350,33 +406,20 @@ def fetch_case():
             "state": query_obj.state,
             "district": query_obj.district,
             "query_time": query_obj.query_time,
-            "status": query_obj.status
+            "status": query_obj.status,
+            "raw_html": raw_html,
+            "latest_pdf_link": latest_pdf_link  # ✅ Always present
         }
 
-        details_data = {}
-        if details_obj:
-            details_data = {
-                "registration_number": details_obj.registration_number,
-                "registration_date": details_obj.registration_date,
-                "judgment_date": details_obj.judgment_date,
-                "petitioner": details_obj.petitioner,
-                "respondent": details_obj.respondent,
-                "advocate_name": details_obj.advocate_name,
-                "next_hearing_date": details_obj.next_hearing_date,
-                "Remark": details_obj.Remark
-            }
-
-        # 5. Paths for PDF (absolute)
+        # 7️⃣ Generate PDF
         logo_abs_path = absolute_path('static/media/logo.png')
         flag_abs_path = absolute_path('static/media/flag.png')
 
-        # 6. PDF absolute save path
         pdf_filename = f"Order_Summary_{query_data['id']}.pdf"
         pdf_dir = absolute_path('static/reports')
         os.makedirs(pdf_dir, exist_ok=True)
         pdf_abs_path = os.path.join(pdf_dir, pdf_filename)
 
-        # 7. HTML for PDF (no download link in PDF)
         html_for_pdf = render_template(
             'GeneratedReport.html',
             query=query_data,
@@ -385,16 +428,14 @@ def fetch_case():
             logo_path=logo_abs_path,
             flag_path=flag_abs_path,
             pdf_url=None,
-            auto_open_pdf = False
+            auto_open_pdf=False
         )
 
         with open(pdf_abs_path, "wb") as f:
-            pisa.CreatePDF(html_for_pdf, dest=f)
+            pisa.CreatePDF(html_for_pdf.encode('utf-8'), dest=f)
 
-        # 8. Browser URL for the saved PDF
         pdf_url = url_for("static", filename=f"reports/{pdf_filename}")
 
-        # 9. Render preview with working link
         return render_template(
             "GeneratedReport.html",
             query=query_data,
@@ -406,14 +447,4 @@ def fetch_case():
             auto_open_pdf=True
         )
 
-    return render_template('fetch_case.html')
-
-@main.route('/case-list')
-def case_list():
-    page = request.args.get('page', 1, type=int)
-    per_page = 10  # cases per page
-
-    pagination = CaseQuery.query.order_by(CaseQuery.id.desc()).paginate(page=page, per_page=per_page, error_out=False)
-    cases = pagination.items
-
-    return render_template('case_list.html', cases=cases, pagination=pagination)
+    return render_template('fetch_case.html', form_data={})

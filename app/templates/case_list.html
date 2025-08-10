@@ -120,7 +120,7 @@
                         <strong>Registration No:</strong> {{ case.case_detail.registration_number if case.case_detail else '' }}<br>
                         <strong>Registration Date:</strong> {{ case.case_detail.registration_date if case.case_detail else '' }}<br>
                         <strong>Court Complex:</strong> {{ case.court_complex or '' }}<br>
-                        <strong>Remark:</strong> {{ case.case_detail.Remark if case.case_detail else '' }}<br>
+                        <strong>Remark:</strong> {{ case.case_detail.remark if case.case_detail else '' }}<br>
                         <strong>Query Time:</strong> {{ case.query_time.strftime('%Y-%m-%d %H:%M:%S') if case.query_time else '' }}
                     </td>
                 </tr>
