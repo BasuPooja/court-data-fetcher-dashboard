@@ -1,5 +1,8 @@
 from datetime import datetime
 from . import db
+from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey
+from sqlalchemy.orm import relationship
+
 
 
 class CaseQuery(db.Model):
@@ -16,6 +19,7 @@ class CaseQuery(db.Model):
 
     query_time = db.Column(db.DateTime, default=datetime.utcnow)
     status = db.Column(db.String(20), default="Pending")
+    raw_response = db.Column(db.Text, nullable=True)  # store raw HTML/JSON
 
     # Relationships
     case_detail = db.relationship('ParsedCaseDetails', backref='query', uselist=False)
@@ -29,15 +33,11 @@ class ParsedCaseDetails(db.Model):
 
     registration_number = db.Column(db.String(50))
     registration_date = db.Column(db.String(20))
-
     judgment_date = db.Column(db.String(20))
 
     petitioner = db.Column(db.String(100))
     respondent = db.Column(db.String(100))
     advocate_name = db.Column(db.String(100))
-
     next_hearing_date = db.Column(db.String(20))
 
-    Remark = db.Column(db.String(500))
-
-
+    Remark = db.Column(db.Text, nullable=True)  # longer text support

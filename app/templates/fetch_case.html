@@ -12,48 +12,62 @@
       {% endif %}
     {% endwith %}
 
-    <form method="POST" action="/fetch-case">
+    <form method="POST" action="{{ url_for('main.fetch_case') }}">
+        <!-- Court Complex -->
         <label for="court_complex">Court Complex *</label>
         <select id="court_complex" name="court_complex" required>
             <option value="">Select Court Complex</option>
-            <option value="1">District Court, Faridabad</option>
+            <option value="1" {{ 'selected' if form_data.get('court_complex') == '1' else '' }}>
+                District Court, Faridabad
+            </option>
         </select>
 
+        <!-- Case Type -->
         <label for="case_type">Case Type *</label>
         <select id="case_type" name="case_type" required>
             <option value="">--Select Case Type--</option>
-            <option>District & Sessions Court</option>
-            <option>Chief Judicial Magistrate Court</option>
-            <option>Additional District Court</option>
-            <option>Senior Civil Judge Court</option>
-            <option>Junior Civil Judge Court</option>
-            <option>Family Court (District Level)</option>
-            <option>Fast Track District Court</option>
+            {% set case_types = [
+                'District & Sessions Court',
+                'Chief Judicial Magistrate Court',
+                'Additional District Court',
+                'Senior Civil Judge Court',
+                'Junior Civil Judge Court',
+                'Family Court (District Level)',
+                'Fast Track District Court'
+            ] %}
+            {% for ct in case_types %}
+                <option value="{{ ct }}" {{ 'selected' if form_data.get('case_type') == ct else '' }}>{{ ct }}</option>
+            {% endfor %}
         </select>
 
+        <!-- Case Number -->
         <label for="case_number">Case Number *</label>
-        <input type="text" id="case_number" name="case_number" required placeholder="Enter Case Number">
+        <input type="text" id="case_number" name="case_number"
+               value="{{ form_data.get('case_number', '') }}"
+               required placeholder="Enter Case Number">
 
+        <!-- Filing Year -->
         <label for="year">Filing Year *</label>
-        <input type="text" id="year" name="year" required placeholder="e.g. 2022">
-            <div class="captcha-box">
-                <label for="captcha">Enter Captcha *</label>
+        <input type="text" id="year" name="year"
+               value="{{ form_data.get('year', '') }}"
+               required placeholder="e.g. 2022">
 
-
-                <!-- Line 1: Captcha Image + Refresh -->
-                <div style="display: flex; align-items: center; margin-top: 5px;">
-                    <img id="captchaImage" src="{{ url_for('main.captcha_image') }}" alt="CAPTCHA" style="border: 1px solid #ccc; height: 35px; margin-right: 6px;">
-                    <a href="#" onclick="refreshCaptcha(); return false;" title="Refresh Captcha">🔄</a>
-                </div>
-                <br>
-                <!-- Line 2: Input Field -->
-                <div style="margin-top: 10px;">
-                    <input type="text" name="captcha" id="captcha" placeholder="Enter Captcha" required>
-                </div>
+        <!-- Captcha -->
+        <div class="captcha-box">
+            <label for="captcha">Enter Captcha *</label>
+            <div style="display: flex; align-items: center; margin-top: 5px;">
+                <img id="captchaImage"
+                     src="{{ url_for('main.captcha_image') }}"
+                     alt="CAPTCHA"
+                     style="border: 1px solid #ccc; height: 35px; margin-right: 6px;">
+                <a href="#" onclick="refreshCaptcha(); return false;" title="Refresh Captcha">🔄</a>
             </div>
+            <div style="margin-top: 10px;">
+                <input type="text" name="captcha" id="captcha" placeholder="Enter Captcha" required>
+            </div>
+        </div>
 
-
-
+        <!-- Buttons -->
         <div class="buttons mt-3">
             <button type="submit">Search</button>
             <button type="reset">Reset</button>
@@ -62,29 +76,13 @@
 </div>
 
 <script>
-    function refreshCaptcha() {
-        fetch("/new-captcha")
-            .then(response => response.text())
-            .then(data => {
-                document.getElementById("captcha-text").innerText = data;
-            });
-    }
-</script>
-<script>
-    function refreshCaptcha() {
-        const img = document.getElementById("captchaImage");
-        img.src = "{{ url_for('main.captcha_image') }}" + "?_=" + new Date().getTime(); // Prevent caching
-    }
-</script>
-<script>
 function refreshCaptcha() {
-    document.getElementById('captcha-img').src = "{{ url_for('main.captcha_image') }}" + "?" + Date.now();
-}
-</script>
-<script>
-function refreshCaptcha() {
-    document.getElementById('captcha-img').src =
+    document.getElementById('captchaImage').src =
         "{{ url_for('main.captcha_image') }}" + "?" + Date.now();
+    const captchaInput = document.querySelector('input[name="captcha"]');
+    captchaInput.value = ''; // clear only captcha field
+    captchaInput.focus();    // auto-focus so user can start typing
 }
 </script>
+
 {% endblock %}
