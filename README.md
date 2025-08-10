@@ -103,8 +103,9 @@ LOG_LEVEL=INFO
 
 ## 🖼 Dashboard Preview
 
-![List Screenshot](https://github.com/user-attachments/assets/96260673-df09-4723-9fb3-ac34e9cfecb3)
+![Dashboard Screnshot](https://github.com/user-attachments/assets/842c4ccb-fcba-44c1-9f83-097509c6ff49)
 
+![List Screenshot](https://github.com/user-attachments/assets/96260673-df09-4723-9fb3-ac34e9cfecb3)
 
 ---
 
