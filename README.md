@@ -6,7 +6,7 @@ A Flask-based system to fetch case details from an Indian district court website
 
 ## 📋 Court Chosen
 - **District Court: Faridabad (Haryana)**
-- **Portal:** eCourts Services Portal (https://districts.ecourts.gov.in)
+- **Portal:** eCourts Services Portal (https://faridabad.dcourts.gov.in/)
 - Scraping targets:
   - Parties’ names
   - Filing & next-hearing dates
