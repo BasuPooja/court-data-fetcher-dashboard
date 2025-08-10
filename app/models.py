@@ -1,9 +1,5 @@
 from datetime import datetime
 from . import db
-from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey
-from sqlalchemy.orm import relationship
-
-
 
 class CaseQuery(db.Model):
     __tablename__ = 'case_queries'
@@ -19,9 +15,12 @@ class CaseQuery(db.Model):
 
     query_time = db.Column(db.DateTime, default=datetime.utcnow)
     status = db.Column(db.String(20), default="Pending")
-    raw_response = db.Column(db.Text, nullable=True)  # store raw HTML/JSON
+    raw_response = db.Column(db.Text, nullable=True)  # store raw HTML or JSON from scraper
 
-    # Relationships
+    # ✅ New field to store the latest PDF link (Requirement #2)
+    latest_pdf_link = db.Column(db.String(300), nullable=True)
+
+    # Relationship to parsed details
     case_detail = db.relationship('ParsedCaseDetails', backref='query', uselist=False)
 
 
@@ -35,9 +34,13 @@ class ParsedCaseDetails(db.Model):
     registration_date = db.Column(db.String(20))
     judgment_date = db.Column(db.String(20))
 
-    petitioner = db.Column(db.String(100))
-    respondent = db.Column(db.String(100))
-    advocate_name = db.Column(db.String(100))
+    petitioner = db.Column(db.String(200))
+    respondent = db.Column(db.String(200))
+    advocate_name = db.Column(db.String(200))
     next_hearing_date = db.Column(db.String(20))
 
-    Remark = db.Column(db.Text, nullable=True)  # longer text support
+    remark = db.Column(db.Text, nullable=True)  # lowercase for Python convention
+
+    # ✅ If you want to store multiple order/judgment PDF links later
+    order_pdf_link = db.Column(db.String(300), nullable=True)
+
