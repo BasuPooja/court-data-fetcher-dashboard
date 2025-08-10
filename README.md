@@ -20,8 +20,8 @@ A Flask-based system to fetch case details from an Indian district court website
 
 ### 1️⃣ Clone the Repository
 ```bash
-git clone https://github.com/your-username/court-data-fetcher.git
-cd court-data-fetcher
+git clone https://github.com/BasuPooja/court-data-fetcher-dashboard.git
+cd court-data-fetcher-dashboard
 ```
 
 ### 2️⃣ Create and Activate Virtual Environment
@@ -43,12 +43,7 @@ Create a `.env` file in the root folder (see **Sample Env Vars** section).
 ```bash
 flask db upgrade
 ```
-or for SQLite:
-```bash
-python
->>> from app import db
->>> db.create_all()
-```
+
 
 ### 6️⃣ Run the Application
 ```bash
@@ -107,7 +102,9 @@ LOG_LEVEL=INFO
 ---
 
 ## 🖼 Dashboard Preview
-*(Add screenshots here if available)*
+
+![List Screenshot](https://github.com/user-attachments/assets/96260673-df09-4723-9fb3-ac34e9cfecb3)
+
 
 ---
 
