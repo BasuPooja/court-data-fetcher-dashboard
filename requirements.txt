@@ -1,12 +1,33 @@
-Flask==2.3.3
+# --- Core Web App ---
+Flask==3.0.3
 Flask-SQLAlchemy==3.1.1
 Flask-Migrate==4.0.5
 Flask-Cors==4.0.0
 Flask-WTF==1.2.1
+Werkzeug==3.0.3
+Jinja2==3.1.4
 python-dotenv==1.0.1
-requests==2.31.0
 gunicorn==21.2.0
-beautifulsoup4==4.12.3
-pdfminer.six==20221105
+
+# --- Database Drivers ---
+psycopg2-binary==2.9.9   # PostgreSQL driver
+# SQLite is built-in with Python (no extra package needed)
+
+# --- Utilities & Data Generation ---
+Faker==25.9.1
 pandas==2.1.4
-selenium==4.16.0
+
+# --- PDF Generation ---
+xhtml2pdf==0.2.15
+reportlab==4.2.2
+Pillow==10.4.0
+pdfminer.six==20221105
+
+# --- Web Scraping ---
+requests==2.32.3
+beautifulsoup4==4.12.3
+lxml==5.2.2
+selenium==4.23.1
+
+# --- Automation (optional for Selenium) ---
+webdriver-manager==4.0.2
